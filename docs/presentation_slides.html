@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Nayanee — ZEISS Hackathon 3-Slide Presentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #091e42;
+      color: #172b4d;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .deck-container {
+      width: 100%;
+      max-width: 1100px;
+      height: 640px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide {
+      flex: 1;
+      padding: 44px 56px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.3s ease;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #ebecf0;
+      padding-bottom: 16px;
+    }
+    .brand-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #002b66;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-badge {
+      background: #0052cc;
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+    .theme-tags {
+      display: flex;
+      gap: 8px;
+    }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tag-primary { background: #deebff; color: #0747a6; }
+    .tag-sec { background: #eae6ff; color: #403294; }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 20px;
+    }
+    .card-box {
+      background: #f4f5f7;
+      border-radius: 10px;
+      padding: 20px 24px;
+      border-left: 4px solid #0052cc;
+    }
+    .card-box.alert { border-left-color: #de350b; background: #fff5f5; }
+    .card-box.success { border-left-color: #00875a; background: #f3fcf7; }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #091e42;
+      margin-bottom: 12px;
+    }
+    ul.points-list {
+      list-style: none;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #253858;
+    }
+    ul.points-list li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 22px;
+    }
+    ul.points-list li::before {
+      content: "•";
+      color: #0052cc;
+      font-size: 1.4rem;
+      position: absolute;
+      left: 4px;
+      top: -3px;
+    }
+    .card-box.alert ul.points-list li::before { color: #de350b; }
+    .card-box.success ul.points-list li::before { color: #00875a; }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .stat-pill {
+      background: #ebf3fc;
+      border: 1px solid #b3d4ff;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-val { font-size: 1.4rem; font-weight: 800; color: #0052cc; }
+    .stat-lbl { font-size: 0.75rem; color: #5e6c84; font-weight: 600; text-transform: uppercase; }
+
+    .footer-bar {
+      border-top: 1px solid #ebecf0;
+      padding: 14px 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafbfc;
+    }
+    .nav-btn {
+      background: #0052cc;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .nav-btn:disabled { background: #c1c7d0; cursor: not-allowed; }
+    .nav-dots { display: flex; gap: 8px; }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #dfe1e6;
+      cursor: pointer;
+    }
+    .dot.active { background: #0052cc; transform: scale(1.2); }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+    
+    <!-- SLIDE 1 -->
+    <div class="slide active" id="slide-1">
+      <div>
+        <div class="header-bar">
+          <div class="brand-title">
+            <span class="logo-badge">ನ</span>
+            <div>
+              Nayanee (ನಯನಿ) — No-Device Vision Intelligence
+              <div style="font-size: 0.85rem; font-weight: 500; color: #5e6c84;">ZEISS Hackathon Progress Presentation</div>
+            </div>
+          </div>
+          <div class="theme-tags">
+            <span class="tag tag-primary">Theme 2: No-Device Vision</span>
+            <span class="tag tag-sec">Theme 1: AFI</span>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card-box alert">
+            <div class="card-title">⚠️ The Rural & Retail Optical Dilemma</div>
+            <ul class="points-list">
+              <li><strong>No Dedicated Equipment:</strong> Rural stores and vision centers have no autorefractors ($3K-$15K)—just a smartphone or a counter.</li>
+              <li><strong>The 25-Question Form Trap:</strong> Static paper questionnaires fatigue walk-in customers with irrelevant questions.</li>
+              <li><strong>Language & Literacy Barrier:</strong> Customers speak Indic dialects (Kannada, Hindi, etc.); English forms create high friction.</li>
+              <li><strong>The Unsafe LLM Trap:</strong> Generic AI chatbots hallucinate prescriptions, lack clinical boundary checks, and require expensive GPUs.</li>
+            </ul>
+          </div>
+
+          <div class="card-box success">
+            <div class="card-title">💡 The Nayanee Solution (AFI Ethos)</div>
+            <ul class="points-list">
+              <li><strong>Smartphone-Native Anamnesis:</strong> Captures complete functional vision demands without any specialized optical hardware.</li>
+              <li><strong>Voice-First in 6 Indic Languages:</strong> Natural Kannada, Hindi, Tamil, Telugu, Malayalam, and English clinical conversation.</li>
+              <li><strong>Deterministic Clinical Triage:</strong> Distinguishes functional needs from medical red flags; never hallucinates or pretends to diagnose.</li>
+              <li><strong>EHR & Optometrist Ready:</strong> Instantly prepares optometrist handover with printable consultation slip and lens design guidance.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-pill"><div class="stat-val">$0</div><div class="stat-lbl">Hardware Device Cost</div></div>
+        <div class="stat-pill"><div class="stat-val">6</div><div class="stat-lbl">Native Indic Languages</div></div>
+        <div class="stat-pill"><div class="stat-val">&gt; 25%</div><div class="stat-lbl">Question Count Reduced</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide" id="slide-2">
+      <div>
+        <div class="header-bar">
+          <div class="brand-title">
+            <span class="logo-badge">⚙️</span>
+            <div>
+              Technical Breakthroughs & Innovation
+              <div style="font-size: 0.85rem; font-weight: 500; color: #5e6c84;">Engineering Novelty over Alternative Approaches</div>
+            </div>
+          </div>
+          <div class="theme-tags">
+            <span class="tag tag-primary">Adaptive Engine</span>
+            <span class="tag tag-sec">Zero-GPU SLU</span>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card-box">
+            <div class="card-title">1. Information-Theoretic Adaptive Engine (POC-01)</div>
+            <ul class="points-list">
+              <li><strong>Shannon Entropy Scoring:</strong> Quantifies remaining uncertainty across 5 vision domains (Distance, Near, Screen, Lifestyle, Eyewear).</li>
+              <li><strong>Dynamic Pruning:</strong> Automatically suppresses non-applicable questions (e.g. progressive adaptation for first-time readers).</li>
+              <li><strong>Cross-Check Contradiction Detector:</strong> Catches inconsistent answers in real-time and flags for optometrist review.</li>
+            </ul>
+          </div>
+
+          <div class="card-box">
+            <div class="card-title">2. Voice Architecture & Zero-GPU SLU (POC-02 & 03)</div>
+            <ul class="points-list">
+              <li><strong>Server-Streamed Native MP3 Audio:</strong> Streams high-clarity native Indic voice (/api/v1/session/speak), overcoming OS speech pack deficits.</li>
+              <li><strong>Clinical Spoken Language Understanding:</strong> Zero-GPU keyword and token-overlap parser matches intent with confidence scoring.</li>
+              <li><strong>Deterministic Red-Flag Sentinel:</strong> Immediate halt on acute symptoms (pain, flashes, vision drop); zero LLM hallucination.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-pill"><div class="stat-val">&lt; 0.1ms</div><div class="stat-lbl">Decision Tree Latency</div></div>
+        <div class="stat-pill"><div class="stat-val">100%</div><div class="stat-lbl">Deterministic Safety Halt</div></div>
+        <div class="stat-pill"><div class="stat-val">38 / 38</div><div class="stat-lbl">Automated Tests Passed</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide" id="slide-3">
+      <div>
+        <div class="header-bar">
+          <div class="brand-title">
+            <span class="logo-badge">🚀</span>
+            <div>
+              Clinical Handover & Frugal Deployment
+              <div style="font-size: 0.85rem; font-weight: 500; color: #5e6c84;">Optometrist Decision Support & Ready-to-Deploy Architecture</div>
+            </div>
+          </div>
+          <div class="theme-tags">
+            <span class="tag tag-primary">Optometrist Review</span>
+            <span class="tag tag-sec">Printable Slip</span>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card-box success">
+            <div class="card-title">Clinical Handover & Lifestyle Advisor (POC-05)</div>
+            <ul class="points-list">
+              <li><strong>Pre-Refraction Guidance:</strong> Recommends blue-attenuating filters for high-screen workloads (&gt; 8 hrs) and UV400/photochromic for sun exposure.</li>
+              <li><strong>Optometrist Review Portal:</strong> Live triage queue with domain uncertainty radar, audit trails, and multi-patient management.</li>
+              <li><strong>Printable Consultation Slip:</strong> 1-click HTML print format with patient demographics and optometrist sign-off block.</li>
+            </ul>
+          </div>
+
+          <div class="card-box">
+            <div class="card-title">Frugal Architecture & Verification (POC-06)</div>
+            <ul class="points-list">
+              <li><strong>Hardware Independence:</strong> Runs on any smartphone, store PC, or $35 Raspberry Pi (< 80 MB RAM, zero cloud GPU).</li>
+              <li><strong>PWA Offline Resilient:</strong> Service Worker (sw.js) and Web Manifest for home screen installation.</li>
+              <li><strong>1-Click Deployment:</strong> Standardized on start.bat with automated Python 3.12 environment detection.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-pill"><div class="stat-val">&lt; 80 MB</div><div class="stat-lbl">Memory Footprint (CPU)</div></div>
+        <div class="stat-pill"><div class="stat-val">1-Click</div><div class="stat-lbl">Windows Launch (start.bat)</div></div>
+        <div class="stat-pill"><div class="stat-val">Live</div><div class="stat-lbl">github.com/Satish8460/Nayanee</div></div>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="footer-bar">
+      <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>← Previous</button>
+      <div class="nav-dots">
+        <div class="dot active" onclick="goToSlide(1)"></div>
+        <div class="dot" onclick="goToSlide(2)"></div>
+        <div class="dot" onclick="goToSlide(3)"></div>
+      </div>
+      <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 3;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach((s, idx) => {
+        s.classList.toggle('active', idx === (n - 1));
+      });
+      document.querySelectorAll('.dot').forEach((d, idx) => {
+        d.classList.toggle('active', idx === (n - 1));
+      });
+      document.getElementById('prevBtn').disabled = (n === 1);
+      document.getElementById('nextBtn').disabled = (n === totalSlides);
+      currentSlide = n;
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides) showSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 1) showSlide(currentSlide - 1); }
+    function goToSlide(n) { showSlide(n); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+  </script>
+</body>
+</html>
