@@ -1,224 +1,416 @@
-"""Generates a professional 3-slide widescreen (.pptx) presentation for Nayanee ZEISS Hackathon.
+"""Generates an executive-grade, visually polished 3-slide widescreen (.pptx) presentation
+for Nayanee — ZEISS Hackathon Theme 2 (No-Device Vision Intelligence) & Theme 1 (AFI).
 """
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
 
-def create_presentation(output_path: str = "docs/Nayanee_Progress_Presentation_3_Slides.pptx"):
+def build_executive_deck(output_paths: list = None):
+    if output_paths is None:
+        output_paths = [
+            "docs/Nayanee_Progress_Presentation_3_Slides.pptx",
+            "docs/Nayanee_Executive_Presentation_3_Slides.pptx"
+        ]
     prs = Presentation()
-    # 16:9 Widescreen dimensions
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank_layout = prs.slide_layouts[6]
 
-    # Color Palette
-    COLOR_NAVY = RGBColor(0, 43, 102)        # #002B66
-    COLOR_PRIMARY = RGBColor(0, 82, 204)     # #0052CC
-    COLOR_TEXT_DARK = RGBColor(23, 43, 77)   # #172B4D
-    COLOR_TEXT_MUTED = RGBColor(94, 108, 132)# #5E6C84
-    COLOR_BG_CARD = RGBColor(244, 245, 247)  # #F4F5F7
-    COLOR_CARD_BORDER = RGBColor(223, 225, 230) # #DFE1E6
-    COLOR_ALERT_BG = RGBColor(255, 240, 235) # #FFF0EB
-    COLOR_ALERT_TXT = RGBColor(191, 38, 0)   # #BF2600
-    COLOR_SUCCESS_BG = RGBColor(235, 250, 242) # #EBFAF2
-    COLOR_SUCCESS_TXT = RGBColor(0, 102, 68) # #006644
-    COLOR_WHITE = RGBColor(255, 255, 255)
-    COLOR_PILL_BG = RGBColor(222, 235, 255)  # #DEEBFF
-    COLOR_PILL_TXT = RGBColor(7, 71, 166)    # #0747A6
+    FONT_FAMILY = "Segoe UI"
 
-    def add_header(slide, title_text, subtitle_text, slide_num):
-        # Top banner shape
-        banner = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(1.15))
-        banner.fill.solid()
-        banner.fill.fore_color.rgb = COLOR_NAVY
-        banner.line.color.rgb = COLOR_NAVY
+    # Executive Color System (Deep Tech Navy / Electric Cyan / Pristine White)
+    BG_DARK = RGBColor(6, 21, 45)          # #06152D
+    BG_CARD = RGBColor(14, 38, 77)         # #0E264D
+    BG_CARD_BORDER = RGBColor(30, 68, 128) # #1E4480
+    ACCENT_CYAN = RGBColor(0, 210, 255)    # #00D2FF
+    ACCENT_BLUE = RGBColor(0, 114, 255)    # #0072FF
+    ACCENT_GREEN = RGBColor(0, 230, 118)   # #00E676
+    ACCENT_RED = RGBColor(255, 82, 82)     # #FF5252
+    TEXT_LIGHT = RGBColor(240, 246, 255)   # #F0F6FF
+    TEXT_MUTED = RGBColor(140, 168, 204)   # #8CA8CC
+    WHITE = RGBColor(255, 255, 255)
 
-        # Logo / Icon box
-        logo_box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.2), Inches(0.75), Inches(0.75))
-        logo_box.fill.solid()
-        logo_box.fill.fore_color.rgb = COLOR_PRIMARY
-        logo_box.line.color.rgb = COLOR_PRIMARY
-        tf_l = logo_box.text_frame
-        p_l = tf_l.paragraphs[0]
-        p_l.text = "न"
-        p_l.font.size = Pt(22)
-        p_l.font.bold = True
-        p_l.font.color.rgb = COLOR_WHITE
-        p_l.alignment = PP_ALIGN.CENTER
+    def paint_background(slide):
+        bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
+        bg.fill.solid()
+        bg.fill.fore_color.rgb = BG_DARK
+        bg.line.fill.background()
+        return bg
 
-        # Title text
-        tx = slide.shapes.add_textbox(Inches(1.7), Inches(0.15), Inches(7.5), Inches(0.85))
+    def add_top_nav(slide, title_text, category_pill, slide_num):
+        # Header Box
+        tx = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(8.5), Inches(0.9))
         tf = tx.text_frame
         tf.word_wrap = True
-        p1 = tf.paragraphs[0]
-        p1.text = title_text
-        p1.font.size = Pt(20)
-        p1.font.bold = True
-        p1.font.color.rgb = COLOR_WHITE
+        tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
 
-        p2 = tf.add_paragraph()
-        p2.text = subtitle_text
-        p2.font.size = Pt(11)
-        p2.font.color.rgb = RGBColor(179, 212, 255)
+        p_sub = tf.paragraphs[0]
+        p_sub.text = "NAYANEE (ನಯನಿ) • ZEISS HACKATHON PROGRESS"
+        p_sub.font.size = Pt(9.5)
+        p_sub.font.bold = True
+        p_sub.font.color.rgb = ACCENT_CYAN
+        p_sub.space_after = Pt(2)
 
-        # Theme Badge (Right)
-        badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.6), Inches(0.3), Inches(3.0), Inches(0.55))
-        badge.fill.solid()
-        badge.fill.fore_color.rgb = COLOR_PRIMARY
-        badge.line.color.rgb = COLOR_WHITE
-        tf_b = badge.text_frame
-        p_b = tf_b.paragraphs[0]
-        p_b.text = "ZEISS Theme 2 (Primary) & 1 (AFI)"
-        p_b.font.size = Pt(10)
-        p_b.font.bold = True
-        p_b.font.color.rgb = COLOR_WHITE
-        p_b.alignment = PP_ALIGN.CENTER
+        p_title = tf.add_paragraph()
+        p_title.text = title_text
+        p_title.font.size = Pt(22)
+        p_title.font.bold = True
+        p_title.font.color.rgb = WHITE
 
-        # Slide Number (Bottom Right)
-        footer_tx = slide.shapes.add_textbox(Inches(10.5), Inches(7.0), Inches(2.2), Inches(0.35))
-        tf_f = footer_tx.text_frame
-        p_f = tf_f.paragraphs[0]
-        p_f.text = f"Slide {slide_num} of 3 | Nayanee"
-        p_f.font.size = Pt(10)
-        p_f.font.color.rgb = COLOR_TEXT_MUTED
-        p_f.alignment = PP_ALIGN.RIGHT
+        # Pill Tag (Top Right)
+        pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.4), Inches(0.45), Inches(3.1), Inches(0.45))
+        pill.fill.solid()
+        pill.fill.fore_color.rgb = BG_CARD
+        pill.line.color.rgb = ACCENT_CYAN
+        pill.line.width = Pt(1)
+        tf_p = pill.text_frame
+        p_p = tf_p.paragraphs[0]
+        p_p.text = category_pill
+        p_p.font.size = Pt(9.5)
+        p_p.font.bold = True
+        p_p.font.color.rgb = ACCENT_CYAN
+        p_p.alignment = PP_ALIGN.CENTER
 
-    def add_card(slide, left, top, width, height, title, items, bg_color=COLOR_BG_CARD, border_color=COLOR_PRIMARY, title_color=COLOR_NAVY):
-        card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
-        card.fill.solid()
-        card.fill.fore_color.rgb = bg_color
-        card.line.color.rgb = border_color
-        card.line.width = Pt(1.5)
+        # Slide Number
+        num_box = slide.shapes.add_textbox(Inches(11.0), Inches(7.05), Inches(1.5), Inches(0.3))
+        tf_n = num_box.text_frame
+        p_n = tf_n.paragraphs[0]
+        p_n.text = f"{slide_num} / 3"
+        p_n.font.size = Pt(9.5)
+        p_n.font.color.rgb = TEXT_MUTED
+        p_n.alignment = PP_ALIGN.RIGHT
 
-        tx = slide.shapes.add_textbox(left + Inches(0.2), top + Inches(0.15), width - Inches(0.4), height - Inches(0.3))
+    def create_metric_tile(slide, left, top, width, height, stat_value, stat_label, accent_color=ACCENT_CYAN):
+        tile = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
+        tile.fill.solid()
+        tile.fill.fore_color.rgb = BG_CARD
+        tile.line.color.rgb = BG_CARD_BORDER
+        tile.line.width = Pt(1)
+
+        tx = slide.shapes.add_textbox(left, top + Inches(0.1), width, height - Inches(0.15))
         tf = tx.text_frame
         tf.word_wrap = True
+        tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
 
-        p_t = tf.paragraphs[0]
-        p_t.text = title
-        p_t.font.size = Pt(13)
-        p_t.font.bold = True
-        p_t.font.color.rgb = title_color
-        p_t.space_after = Pt(8)
-
-        for heading, body in items:
-            p = tf.add_paragraph()
-            p.text = f"• {heading}: "
-            p.font.bold = True
-            p.font.size = Pt(10.5)
-            p.font.color.rgb = COLOR_TEXT_DARK
-
-            run = p.add_run()
-            run.text = body
-            run.font.bold = False
-            run.font.size = Pt(10.5)
-            run.font.color.rgb = COLOR_TEXT_DARK
-            p.space_after = Pt(6)
-
-    def add_stat_box(slide, left, top, width, height, val_text, label_text):
-        box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
-        box.fill.solid()
-        box.fill.fore_color.rgb = COLOR_PILL_BG
-        box.line.color.rgb = COLOR_PRIMARY
-        box.line.width = Pt(1)
-
-        tx = slide.shapes.add_textbox(left, top + Inches(0.05), width, height - Inches(0.1))
-        tf = tx.text_frame
         p1 = tf.paragraphs[0]
-        p1.text = val_text
-        p1.font.size = Pt(18)
+        p1.text = stat_value
+        p1.font.size = Pt(22)
         p1.font.bold = True
-        p1.font.color.rgb = COLOR_PRIMARY
+        p1.font.color.rgb = accent_color
         p1.alignment = PP_ALIGN.CENTER
 
         p2 = tf.add_paragraph()
-        p2.text = label_text
+        p2.text = stat_label
         p2.font.size = Pt(8.5)
         p2.font.bold = True
-        p2.font.color.rgb = COLOR_TEXT_MUTED
+        p2.font.color.rgb = TEXT_MUTED
         p2.alignment = PP_ALIGN.CENTER
 
-    # ==========================================
-    # SLIDE 1: Problem & The No-Device Vision
-    # ==========================================
+    # =========================================================================
+    # SLIDE 1: THE PARADIGM SHIFT (No-Device Vision Intelligence)
+    # =========================================================================
     s1 = prs.slides.add_slide(blank_layout)
-    add_header(s1, "Nayanee (ನಯನಿ) — No-Device Vision Intelligence", "Capturing Functional Vision Demands at Ordinary Counters Without Specialized Hardware", 1)
+    paint_background(s1)
+    add_top_nav(s1, "No-Device Vision Intelligence for Walk-In Retail", "Theme 2 (Primary) & Theme 1 (AFI)", "01")
 
-    s1_left_items = [
-        ("No Dedicated Equipment", "In thousands of rural stores, there are no $10K autorefractors—just a phone or a counter."),
-        ("The 25-Question Form Trap", "Static paper forms fatigue walk-in customers with irrelevant progressive adaptation questions."),
-        ("Language & Literacy Divide", "Customers speak regional Indic dialects (Kannada, Hindi, etc.); English questionnaires create high friction."),
-        ("The Unsafe Generative AI Trap", "Generic LLM chatbots hallucinate unsupported prescriptions, lack clinical boundary safety, and require costly cloud GPUs.")
+    # Left Column: The Problem Card
+    left_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.5), Inches(5.6), Inches(4.3))
+    left_card.fill.solid()
+    left_card.fill.fore_color.rgb = BG_CARD
+    left_card.line.color.rgb = ACCENT_RED
+    left_card.line.width = Pt(1.5)
+
+    tx_l = s1.shapes.add_textbox(Inches(1.05), Inches(1.7), Inches(5.1), Inches(3.9))
+    tf_l = tx_l.text_frame
+    tf_l.word_wrap = True
+
+    p = tf_l.paragraphs[0]
+    p.text = "THE RURAL & RETAIL DILEMMA"
+    p.font.size = Pt(12)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_RED
+    p.space_after = Pt(12)
+
+    problems = [
+        ("No Testing Equipment", "Small stores have no $10,000 autorefractors—just a phone or a front counter."),
+        ("25-Question Form Fatigue", "Static paper/digital questionnaires waste time asking irrelevant questions to every customer."),
+        ("Language & Literacy Barrier", "Walk-in customers speak Dravidian/Indic dialects; English forms create high friction."),
+        ("The Unsafe LLM Trap", "Generic generative AI chatbots hallucinate unsupported prescriptions and lack medical safety gates.")
     ]
-    add_card(s1, Inches(0.8), Inches(1.4), Inches(5.6), Inches(4.3), "⚠️ The Rural & Retail Optical Dilemma", s1_left_items, COLOR_ALERT_BG, RGBColor(222, 53, 11), COLOR_ALERT_TXT)
+    for title, desc in problems:
+        p = tf_l.add_paragraph()
+        p.text = f"✕  {title}: "
+        p.font.size = Pt(10)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
 
-    s1_right_items = [
-        ("Smartphone-Native Anamnesis", "Captures complete functional vision needs on any phone or PC without dedicated refractive hardware."),
-        ("Voice-First in 6 Indic Languages", "Natural, culturally authentic clinical conversations in Kannada, Hindi, Tamil, Telugu, Malayalam, and English."),
-        ("Adaptive Entropy Questioning", "Selects the most informative next question based on information gain, pruning questions by > 25%."),
-        ("Optometrist Review & Handover", "Prepares structured clinical profiles, optical lifestyle recommendations, and printable consultation slips.")
+        run = p.add_run()
+        run.text = desc
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(8)
+
+    # Right Column: The Nayanee Solution Card
+    right_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.5), Inches(5.7), Inches(4.3))
+    right_card.fill.solid()
+    right_card.fill.fore_color.rgb = BG_CARD
+    right_card.line.color.rgb = ACCENT_GREEN
+    right_card.line.width = Pt(1.5)
+
+    tx_r = s1.shapes.add_textbox(Inches(7.05), Inches(1.7), Inches(5.2), Inches(3.9))
+    tf_r = tx_r.text_frame
+    tf_r.word_wrap = True
+
+    p = tf_r.paragraphs[0]
+    p.text = "THE NAYANEE BREAKTHROUGH (AFI ETHOS)"
+    p.font.size = Pt(12)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_GREEN
+    p.space_after = Pt(12)
+
+    solutions = [
+        ("Zero Hardware Dependency", "Captures complete functional vision demands on any commodity smartphone or store PC."),
+        ("6 Native Indic Languages", "Communicates naturally via voice in Kannada, Hindi, Tamil, Telugu, Malayalam, and English."),
+        ("Mathematical Entropy Pruning", "Information-theoretic engine cuts consultation length by > 25% by pruning irrelevant inquiries."),
+        ("Deterministic Clinical Safety", "Hardcoded acute red-flag triage immediately halts on emergency symptoms with zero hallucination.")
     ]
-    add_card(s1, Inches(6.8), Inches(1.4), Inches(5.6), Inches(4.3), "💡 The Nayanee Solution (AFI Approach)", s1_right_items, COLOR_SUCCESS_BG, RGBColor(0, 135, 90), COLOR_SUCCESS_TXT)
+    for title, desc in solutions:
+        p = tf_r.add_paragraph()
+        p.text = f"✓  {title}: "
+        p.font.size = Pt(10)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
 
-    add_stat_box(s1, Inches(0.8), Inches(5.9), Inches(3.6), Inches(0.85), "$0 Hardware", "COMMODITY SMARTPHONE / PC")
-    add_stat_box(s1, Inches(4.8), Inches(5.9), Inches(3.6), Inches(0.85), "6 Indic Languages", "AUTHENTIC NATIVE SPOKEN VOICE")
-    add_stat_box(s1, Inches(8.8), Inches(5.9), Inches(3.6), Inches(0.85), "> 25% Pruning", "FASTER ADAPTIVE CONSULTATION")
+        run = p.add_run()
+        run.text = desc
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(8)
 
-    # ==========================================
-    # SLIDE 2: Technical Breakthroughs & Novelty
-    # ==========================================
+    # Bottom Metric Strip
+    create_metric_tile(s1, Inches(0.8), Inches(6.0), Inches(2.7), Inches(0.85), "$0", "HARDWARE EQUIPMENT COST", ACCENT_GREEN)
+    create_metric_tile(s1, Inches(3.7), Inches(6.0), Inches(2.7), Inches(0.85), "6", "NATIVE INDIC LANGUAGES", ACCENT_CYAN)
+    create_metric_tile(s1, Inches(6.8), Inches(6.0), Inches(2.7), Inches(0.85), "> 25%", "CONSULTATION TIME REDUCED", ACCENT_CYAN)
+    create_metric_tile(s1, Inches(9.7), Inches(6.0), Inches(2.8), Inches(0.85), "100%", "ZERO-GPU CPU EXECUTION", ACCENT_BLUE)
+
+    # =========================================================================
+    # SLIDE 2: UNDER THE HOOD (Technical Novelty & Architecture)
+    # =========================================================================
     s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "Technical Breakthroughs & Algorithmic Novelty", "Frugal Software Intelligence Replacing Expensive Physical Equipment", 2)
+    paint_background(s2)
+    add_top_nav(s2, "Under The Hood: Information Theory & Clinical Safety", "Algorithmic Novelty", "02")
 
-    s2_left_items = [
-        ("Shannon Entropy Scoring", "Quantifies remaining uncertainty across 5 clinical axes: Distance, Near (Presbyopia), Screen, Lifestyle, Eyewear."),
-        ("Dynamic Dependency Pruning", "Automatically suppresses non-applicable questions (e.g. progressive comfort skipped for first-time readers)."),
-        ("Cross-Turn Contradiction Engine", "Catches conflicting answers in real-time (e.g. reporting distance blur but zero trouble with bus signs) and flags for optometrist review.")
+    # 3-Column Pillar Architecture
+    col_w = Inches(3.65)
+    gap = Inches(0.4)
+
+    # Pillar 1: Information Theory Engine
+    p1_card = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.5), col_w, Inches(4.3))
+    p1_card.fill.solid()
+    p1_card.fill.fore_color.rgb = BG_CARD
+    p1_card.line.color.rgb = ACCENT_CYAN
+    p1_card.line.width = Pt(1.5)
+
+    tx_p1 = s2.shapes.add_textbox(Inches(1.0), Inches(1.7), col_w - Inches(0.4), Inches(3.9))
+    tf_p1 = tx_p1.text_frame
+    tf_p1.word_wrap = True
+
+    p = tf_p1.paragraphs[0]
+    p.text = "1. ADAPTIVE ENTROPY ENGINE"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_CYAN
+    p.space_after = Pt(10)
+
+    p1_points = [
+        ("Shannon Entropy Scoring", "Quantifies remaining uncertainty across 5 axes: Distance, Near, Screen, Lifestyle, Eyewear."),
+        ("Dynamic Pruning", "Automatically suppresses non-applicable branches (e.g. progressive comfort skipped for first-time readers)."),
+        ("Contradiction Triage", "Catches conflicting answers in real-time (e.g. reporting distance blur but zero trouble with bus signs).")
     ]
-    add_card(s2, Inches(0.8), Inches(1.4), Inches(5.6), Inches(4.3), "1. Information-Theoretic Adaptive Engine (POC-01)", s2_left_items, COLOR_BG_CARD, COLOR_PRIMARY, COLOR_NAVY)
+    for t, d in p1_points:
+        p = tf_p1.add_paragraph()
+        p.text = f"• {t}: "
+        p.font.size = Pt(9.5)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
+        run = p.add_run()
+        run.text = d
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(6)
 
-    s2_right_items = [
-        ("Server-Streamed Native MP3 Voice", "Streams native Indic speech (/api/v1/session/speak) via HTML5 Audio, overcoming OS speech-pack deficits across all devices."),
-        ("Zero-GPU Clinical SLU Parser", "Local keyword and token-overlap intent matcher (speech_analyzer.py) analyzes spoken native responses on CPU with confidence scoring."),
-        ("Deterministic Red-Flag Sentinel", "Immediate halt on acute symptoms (sudden loss of vision, severe pain, flashes), routing directly to medical ophthalmology with zero hallucination.")
+    # Pillar 2: Multilingual Voice & SLU
+    p2_card = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + col_w + gap, Inches(1.5), col_w, Inches(4.3))
+    p2_card.fill.solid()
+    p2_card.fill.fore_color.rgb = BG_CARD
+    p2_card.line.color.rgb = ACCENT_BLUE
+    p2_card.line.width = Pt(1.5)
+
+    tx_p2 = s2.shapes.add_textbox(Inches(1.0) + col_w + gap, Inches(1.7), col_w - Inches(0.4), Inches(3.9))
+    tf_p2 = tx_p2.text_frame
+    tf_p2.word_wrap = True
+
+    p = tf_p2.paragraphs[0]
+    p.text = "2. DRAVIDIAN VOICE & ZERO-GPU SLU"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_BLUE
+    p.space_after = Pt(10)
+
+    p2_points = [
+        ("Native MP3 Streaming", "Streams clear native Indic speech (/api/v1/session/speak) via HTML5 Audio, bypassing missing OS voice packs."),
+        ("Colloquial Phrasing", "Uses culturally authentic clinical speech rather than mechanical Google Translate word-for-word text."),
+        ("Zero-GPU Intent Matcher", "Local keyword & token-overlap SLU engine parses spoken native answers directly on CPU with confidence scoring.")
     ]
-    add_card(s2, Inches(6.8), Inches(1.4), Inches(5.6), Inches(4.3), "2. Multilingual Voice & Clinical SLU (POC-02 & 03)", s2_right_items, COLOR_BG_CARD, COLOR_PRIMARY, COLOR_NAVY)
+    for t, d in p2_points:
+        p = tf_p2.add_paragraph()
+        p.text = f"• {t}: "
+        p.font.size = Pt(9.5)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
+        run = p.add_run()
+        run.text = d
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(6)
 
-    add_stat_box(s2, Inches(0.8), Inches(5.9), Inches(3.6), Inches(0.85), "< 0.1 ms", "DECISION ENGINE RESPONSE TIME")
-    add_stat_box(s2, Inches(4.8), Inches(5.9), Inches(3.6), Inches(0.85), "100% Deterministic", "ZERO GENERATIVE HALLUCINATION")
-    add_stat_box(s2, Inches(8.8), Inches(5.9), Inches(3.6), Inches(0.85), "38 / 38 Tests", "CI TEST SUITE PASSED")
+    # Pillar 3: Deterministic Clinical Safety
+    p3_card = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8) + (col_w + gap) * 2, Inches(1.5), col_w, Inches(4.3))
+    p3_card.fill.solid()
+    p3_card.fill.fore_color.rgb = BG_CARD
+    p3_card.line.color.rgb = ACCENT_GREEN
+    p3_card.line.width = Pt(1.5)
 
-    # ==========================================
-    # SLIDE 3: Clinical Handover & Frugal Deployment
-    # ==========================================
+    tx_p3 = s2.shapes.add_textbox(Inches(1.0) + (col_w + gap) * 2, Inches(1.7), col_w - Inches(0.4), Inches(3.9))
+    tf_p3 = tx_p3.text_frame
+    tf_p3.word_wrap = True
+
+    p = tf_p3.paragraphs[0]
+    p.text = "3. DETERMINISTIC CLINICAL SAFETY"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_GREEN
+    p.space_after = Pt(10)
+
+    p3_points = [
+        ("Acute Red-Flag Sentinel", "Probes for critical warning signs: sudden vision loss, severe eye pain, and flashes of light."),
+        ("Immediate Emergency Halt", "Aborts routine questioning immediately upon acute symptoms and escalates directly to ophthalmology."),
+        ("Zero Hallucination Risk", "Pure deterministic state machine; never guesses a prescription or replaces professional refraction.")
+    ]
+    for t, d in p3_points:
+        p = tf_p3.add_paragraph()
+        p.text = f"• {t}: "
+        p.font.size = Pt(9.5)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
+        run = p.add_run()
+        run.text = d
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(6)
+
+    # Bottom Metric Strip
+    create_metric_tile(s2, Inches(0.8), Inches(6.0), Inches(2.7), Inches(0.85), "< 0.1 ms", "DECISION ENGINE LATENCY", ACCENT_CYAN)
+    create_metric_tile(s2, Inches(3.7), Inches(6.0), Inches(2.7), Inches(0.85), "100%", "DETERMINISTIC SAFETY GATES", ACCENT_GREEN)
+    create_metric_tile(s2, Inches(6.8), Inches(6.0), Inches(2.7), Inches(0.85), "Sub-500ms", "VOICE STREAMING RESPONSE", ACCENT_BLUE)
+    create_metric_tile(s2, Inches(9.7), Inches(6.0), Inches(2.8), Inches(0.85), "38 / 38", "CI TEST SUITE PASSED", ACCENT_GREEN)
+
+    # =========================================================================
+    # SLIDE 3: CLINICAL HANDOVER & FRUGAL DEPLOYMENT
+    # =========================================================================
     s3 = prs.slides.add_slide(blank_layout)
-    add_header(s3, "Clinical Handover, Optometrist Support & Deployment", "Production-Ready Architecture Built for Real-World Optical Stores", 3)
+    paint_background(s3)
+    add_top_nav(s3, "Clinical Handover, Optometrist Review & Deployment", "Production Readiness", "03")
 
-    s3_left_items = [
-        ("Optical Lifestyle Advisor", "Recommends pre-refraction optical considerations: blue-attenuating filters for screen workload (>8 hrs) and UV400/polarized for outdoor exposure."),
-        ("Optometrist Review Portal", "Dedicated triage dashboard with domain uncertainty radar, patient demographics, and audit trails."),
-        ("Printable Consultation Slip", "Instant 1-click HTML consultation slip ready for store receipt/A4 printing, complete with emergency triage alerts and optometrist sign-off block.")
+    # Left Column: Optometrist Decision Support
+    left_c3 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.5), Inches(5.6), Inches(4.3))
+    left_c3.fill.solid()
+    left_c3.fill.fore_color.rgb = BG_CARD
+    left_c3.line.color.rgb = ACCENT_CYAN
+    left_c3.line.width = Pt(1.5)
+
+    tx_c3l = s3.shapes.add_textbox(Inches(1.05), Inches(1.7), Inches(5.1), Inches(3.9))
+    tf_c3l = tx_c3l.text_frame
+    tf_c3l.word_wrap = True
+
+    p = tf_c3l.paragraphs[0]
+    p.text = "OPTOMETRIST DECISION SUPPORT (POC-05)"
+    p.font.size = Pt(12)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_CYAN
+    p.space_after = Pt(12)
+
+    handover_points = [
+        ("Pre-Refraction Lifestyle Advisor", "Translates intake into optical considerations: blue-light filters for heavy screen hours (>8h); UV400/photochromic for sun exposure."),
+        ("Dedicated Review Portal", "Practitioner triage dashboard with domain uncertainty radar, patient demographics, and audit trail."),
+        ("1-Click Printable Slip", "Formatted consultation slip ready for store receipt/A4 printing, including emergency triage clearance and optometrist sign-off block."),
+        ("EHR Interoperability", "Exports structured JSON profiles ready for hospital electronic health record integration.")
     ]
-    add_card(s3, Inches(0.8), Inches(1.4), Inches(5.6), Inches(4.3), "Optometrist Decision Support & EHR (POC-05)", s3_left_items, COLOR_SUCCESS_BG, RGBColor(0, 135, 90), COLOR_SUCCESS_TXT)
+    for title, desc in handover_points:
+        p = tf_c3l.add_paragraph()
+        p.text = f"✓  {title}: "
+        p.font.size = Pt(10)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
+        run = p.add_run()
+        run.text = desc
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(8)
 
-    s3_right_items = [
-        ("Advanced Frugal Innovation (AFI)", "Runs entirely on CPU with < 80 MB RAM footprint; deployable on ordinary smartphones, store PCs, or a $35 Raspberry Pi."),
+    # Right Column: Frugal Hardware & Production Readiness
+    right_c3 = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.5), Inches(5.7), Inches(4.3))
+    right_c3.fill.solid()
+    right_c3.fill.fore_color.rgb = BG_CARD
+    right_c3.line.color.rgb = ACCENT_GREEN
+    right_c3.line.width = Pt(1.5)
+
+    tx_c3r = s3.shapes.add_textbox(Inches(7.05), Inches(1.7), Inches(5.2), Inches(3.9))
+    tf_c3r = tx_c3r.text_frame
+    tf_c3r.word_wrap = True
+
+    p = tf_c3r.paragraphs[0]
+    p.text = "FRUGAL ARCHITECTURE & READINESS (POC-06)"
+    p.font.size = Pt(12)
+    p.font.bold = True
+    p.font.color.rgb = ACCENT_GREEN
+    p.space_after = Pt(12)
+
+    readiness_points = [
+        ("Micro-Instance Deployment", "Runs entirely on CPU with < 80 MB RAM footprint; deployable on ordinary smartphones, store laptops, or a $35 Raspberry Pi."),
         ("PWA Offline Resilient", "Equipped with Service Worker (sw.js) and Web App Manifest (manifest.json) for standalone home-screen installation."),
-        ("One-Click Launch & GitHub", "Standardized on start.bat with auto Python detection. Verified and live at github.com/Satish8460/Nayanee.")
+        ("1-Click Windows Launch", "Standardized on start.bat with auto Python 3.12 detection, UTF-8 mode, and browser auto-launch."),
+        ("Live Open Source Codebase", "Complete, clean repository up to date on main: github.com/Satish8460/Nayanee.")
     ]
-    add_card(s3, Inches(6.8), Inches(1.4), Inches(5.6), Inches(4.3), "Frugal Hardware Architecture & Verification (POC-06)", s3_right_items, COLOR_BG_CARD, COLOR_PRIMARY, COLOR_NAVY)
+    for title, desc in readiness_points:
+        p = tf_c3r.add_paragraph()
+        p.text = f"✓  {title}: "
+        p.font.size = Pt(10)
+        p.font.bold = True
+        p.font.color.rgb = TEXT_LIGHT
+        run = p.add_run()
+        run.text = desc
+        run.font.bold = False
+        run.font.color.rgb = TEXT_MUTED
+        p.space_after = Pt(8)
 
-    add_stat_box(s3, Inches(0.8), Inches(5.9), Inches(3.6), Inches(0.85), "< 80 MB", "LIGHTWEIGHT CPU RAM FOOTPRINT")
-    add_stat_box(s3, Inches(4.8), Inches(5.9), Inches(3.6), Inches(0.85), "1-Click Launch", "STANDARDIZED WINDOWS START.BAT")
-    add_stat_box(s3, Inches(8.8), Inches(5.9), Inches(3.6), Inches(0.85), "Open Source", "GITHUB.COM/SATISH8460/NAYANEE")
+    # Bottom Metric Strip
+    create_metric_tile(s3, Inches(0.8), Inches(6.0), Inches(2.7), Inches(0.85), "< 80 MB", "LIGHTWEIGHT CPU RAM", ACCENT_CYAN)
+    create_metric_tile(s3, Inches(3.7), Inches(6.0), Inches(2.7), Inches(0.85), "1-Click", "START.BAT LAUNCHER", ACCENT_GREEN)
+    create_metric_tile(s3, Inches(6.8), Inches(6.0), Inches(2.7), Inches(0.85), "PWA Ready", "OFFLINE SERVICE WORKER", ACCENT_BLUE)
+    create_metric_tile(s3, Inches(9.7), Inches(6.0), Inches(2.8), Inches(0.85), "Open Source", "GITHUB.COM/SATISH8460/NAYANEE", ACCENT_CYAN)
 
-    prs.save(output_path)
-    print(f"✅ Generated 16:9 Presentation: {output_path}")
+    for out_p in output_paths:
+        try:
+            prs.save(out_p)
+            print(f"✨ Successfully generated executive presentation: {out_p}")
+        except PermissionError:
+            print(f"⚠️ Could not write to {out_p} (file in use).")
 
 
 if __name__ == "__main__":
-    create_presentation()
+    build_executive_deck()

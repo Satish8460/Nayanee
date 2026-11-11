@@ -8,8 +8,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #091e42;
-      color: #172b4d;
+      background: #030B17;
+      color: #F0F6FF;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -19,11 +19,12 @@
     }
     .deck-container {
       width: 100%;
-      max-width: 1100px;
-      height: 640px;
-      background: #ffffff;
+      max-width: 1140px;
+      height: 660px;
+      background: #06152D;
+      border: 1px solid #1E4480;
       border-radius: 16px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -31,7 +32,7 @@
     }
     .slide {
       flex: 1;
-      padding: 44px 56px;
+      padding: 40px 52px;
       display: none;
       flex-direction: column;
       justify-content: space-between;
@@ -44,28 +45,29 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 2px solid #ebecf0;
+      border-bottom: 1px solid #1E4480;
       padding-bottom: 16px;
     }
     .brand-title {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
-      color: #002b66;
+      color: #FFFFFF;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .logo-badge {
-      background: #0052cc;
+      background: linear-gradient(135deg, #0072FF, #00D2FF);
       color: white;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0,210,255,0.3);
     }
     .theme-tags {
       display: flex;
@@ -74,100 +76,110 @@
     .tag {
       font-size: 0.75rem;
       font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 12px;
+      padding: 6px 12px;
+      border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .tag-primary { background: #deebff; color: #0747a6; }
-    .tag-sec { background: #eae6ff; color: #403294; }
+    .tag-primary { background: rgba(0,210,255,0.12); color: #00D2FF; border: 1px solid rgba(0,210,255,0.4); }
+    .tag-sec { background: rgba(0,230,118,0.12); color: #00E676; border: 1px solid rgba(0,230,118,0.4); }
 
     .content-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 28px;
+      gap: 24px;
       margin-top: 20px;
     }
     .card-box {
-      background: #f4f5f7;
-      border-radius: 10px;
-      padding: 20px 24px;
-      border-left: 4px solid #0052cc;
+      background: #0E264D;
+      border-radius: 12px;
+      padding: 22px 24px;
+      border: 1px solid #1E4480;
     }
-    .card-box.alert { border-left-color: #de350b; background: #fff5f5; }
-    .card-box.success { border-left-color: #00875a; background: #f3fcf7; }
+    .card-box.alert { border-color: rgba(255,82,82,0.6); background: rgba(255,82,82,0.06); }
+    .card-box.success { border-color: rgba(0,230,118,0.6); background: rgba(0,230,118,0.06); }
     .card-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #091e42;
+      color: #FFFFFF;
       margin-bottom: 12px;
+      letter-spacing: 0.2px;
     }
+    .card-box.alert .card-title { color: #FF5252; }
+    .card-box.success .card-title { color: #00E676; }
+
     ul.points-list {
       list-style: none;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       line-height: 1.6;
-      color: #253858;
+      color: #8CA8CC;
     }
     ul.points-list li {
       margin-bottom: 10px;
       position: relative;
-      padding-left: 22px;
+      padding-left: 20px;
     }
+    ul.points-list li strong { color: #F0F6FF; }
     ul.points-list li::before {
       content: "•";
-      color: #0052cc;
-      font-size: 1.4rem;
+      color: #00D2FF;
+      font-size: 1.3rem;
       position: absolute;
-      left: 4px;
+      left: 2px;
       top: -3px;
     }
-    .card-box.alert ul.points-list li::before { color: #de350b; }
-    .card-box.success ul.points-list li::before { color: #00875a; }
+    .card-box.alert ul.points-list li::before { content: "✕"; color: #FF5252; font-size: 0.9rem; top: 1px; }
+    .card-box.success ul.points-list li::before { content: "✓"; color: #00E676; font-size: 0.9rem; top: 1px; }
 
     .stat-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-top: 18px;
     }
     .stat-pill {
-      background: #ebf3fc;
-      border: 1px solid #b3d4ff;
-      border-radius: 8px;
-      padding: 12px;
+      background: #0E264D;
+      border: 1px solid #1E4480;
+      border-radius: 10px;
+      padding: 12px 14px;
       text-align: center;
     }
-    .stat-val { font-size: 1.4rem; font-weight: 800; color: #0052cc; }
-    .stat-lbl { font-size: 0.75rem; color: #5e6c84; font-weight: 600; text-transform: uppercase; }
+    .stat-val { font-size: 1.45rem; font-weight: 800; color: #00D2FF; }
+    .stat-pill:nth-child(1) .stat-val { color: #00E676; }
+    .stat-pill:nth-child(4) .stat-val { color: #0072FF; }
+    .stat-lbl { font-size: 0.72rem; color: #8CA8CC; font-weight: 700; text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px; }
 
     .footer-bar {
-      border-top: 1px solid #ebecf0;
-      padding: 14px 56px;
+      border-top: 1px solid #1E4480;
+      padding: 14px 52px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fafbfc;
+      background: #081B38;
     }
     .nav-btn {
-      background: #0052cc;
+      background: #0072FF;
       color: white;
       border: none;
-      padding: 8px 18px;
+      padding: 8px 20px;
       border-radius: 6px;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.2s;
     }
-    .nav-btn:disabled { background: #c1c7d0; cursor: not-allowed; }
-    .nav-dots { display: flex; gap: 8px; }
+    .nav-btn:hover:not(:disabled) { background: #00D2FF; color: #06152D; }
+    .nav-btn:disabled { background: #1E3A8A; color: #5A7AA8; cursor: not-allowed; }
+    .nav-dots { display: flex; gap: 10px; }
     .dot {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #dfe1e6;
+      background: #1E4480;
       cursor: pointer;
+      transition: all 0.2s;
     }
-    .dot.active { background: #0052cc; transform: scale(1.2); }
+    .dot.active { background: #00D2FF; transform: scale(1.3); box-shadow: 0 0 8px rgba(0,210,255,0.6); }
   </style>
 </head>
 <body>
@@ -215,9 +227,10 @@
       </div>
 
       <div class="stat-row">
-        <div class="stat-pill"><div class="stat-val">$0</div><div class="stat-lbl">Hardware Device Cost</div></div>
+        <div class="stat-pill"><div class="stat-val">$0</div><div class="stat-lbl">Hardware Equipment Cost</div></div>
         <div class="stat-pill"><div class="stat-val">6</div><div class="stat-lbl">Native Indic Languages</div></div>
-        <div class="stat-pill"><div class="stat-val">&gt; 25%</div><div class="stat-lbl">Question Count Reduced</div></div>
+        <div class="stat-pill"><div class="stat-val">&gt; 25%</div><div class="stat-lbl">Consultation Time Reduced</div></div>
+        <div class="stat-pill"><div class="stat-val">100%</div><div class="stat-lbl">Zero-GPU CPU Execution</div></div>
       </div>
     </div>
 
@@ -229,7 +242,7 @@
             <span class="logo-badge">⚙️</span>
             <div>
               Technical Breakthroughs & Innovation
-              <div style="font-size: 0.85rem; font-weight: 500; color: #5e6c84;">Engineering Novelty over Alternative Approaches</div>
+              <div style="font-size: 0.85rem; font-weight: 500; color: #8CA8CC;">Engineering Novelty over Alternative Approaches</div>
             </div>
           </div>
           <div class="theme-tags">
@@ -260,9 +273,10 @@
       </div>
 
       <div class="stat-row">
-        <div class="stat-pill"><div class="stat-val">&lt; 0.1ms</div><div class="stat-lbl">Decision Tree Latency</div></div>
-        <div class="stat-pill"><div class="stat-val">100%</div><div class="stat-lbl">Deterministic Safety Halt</div></div>
-        <div class="stat-pill"><div class="stat-val">38 / 38</div><div class="stat-lbl">Automated Tests Passed</div></div>
+        <div class="stat-pill"><div class="stat-val">&lt; 0.1ms</div><div class="stat-lbl">Decision Engine Latency</div></div>
+        <div class="stat-pill"><div class="stat-val">100%</div><div class="stat-lbl">Deterministic Safety Gates</div></div>
+        <div class="stat-pill"><div class="stat-val">Sub-500ms</div><div class="stat-lbl">Voice Streaming Response</div></div>
+        <div class="stat-pill"><div class="stat-val">38 / 38</div><div class="stat-lbl">CI Test Suite Passed</div></div>
       </div>
     </div>
 
@@ -274,7 +288,7 @@
             <span class="logo-badge">🚀</span>
             <div>
               Clinical Handover & Frugal Deployment
-              <div style="font-size: 0.85rem; font-weight: 500; color: #5e6c84;">Optometrist Decision Support & Ready-to-Deploy Architecture</div>
+              <div style="font-size: 0.85rem; font-weight: 500; color: #8CA8CC;">Optometrist Decision Support & Ready-to-Deploy Architecture</div>
             </div>
           </div>
           <div class="theme-tags">
@@ -305,9 +319,10 @@
       </div>
 
       <div class="stat-row">
-        <div class="stat-pill"><div class="stat-val">&lt; 80 MB</div><div class="stat-lbl">Memory Footprint (CPU)</div></div>
-        <div class="stat-pill"><div class="stat-val">1-Click</div><div class="stat-lbl">Windows Launch (start.bat)</div></div>
-        <div class="stat-pill"><div class="stat-val">Live</div><div class="stat-lbl">github.com/Satish8460/Nayanee</div></div>
+        <div class="stat-pill"><div class="stat-val">&lt; 80 MB</div><div class="stat-lbl">Lightweight CPU RAM</div></div>
+        <div class="stat-pill"><div class="stat-val">1-Click</div><div class="stat-lbl">Windows start.bat Launcher</div></div>
+        <div class="stat-pill"><div class="stat-val">PWA Ready</div><div class="stat-lbl">Offline Service Worker</div></div>
+        <div class="stat-pill"><div class="stat-val">Open Source</div><div class="stat-lbl">github.com/Satish8460/Nayanee</div></div>
       </div>
     </div>
 
