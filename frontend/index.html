@@ -692,6 +692,15 @@
       document.getElementById('patientAgeInput').value = '';
       document.getElementById('patientPhoneInput').value = '';
       document.getElementById('patientGenderSelect').value = '';
+      const chatArea = document.getElementById('chatArea');
+      if (chatArea) chatArea.innerHTML = '';
+      const alertBanner = document.getElementById('alertBanner');
+      if (alertBanner) {
+        alertBanner.style.display = 'none';
+        alertBanner.innerHTML = '';
+      }
+      const voiceStatus = document.getElementById('voiceStatusText');
+      if (voiceStatus) voiceStatus.innerText = 'Tap microphone to speak or click "Listen Question" above';
       document.getElementById('summaryCard').style.display = 'none';
       document.getElementById('interviewCard').style.display = 'none';
       document.getElementById('langCard').style.display = 'block';
