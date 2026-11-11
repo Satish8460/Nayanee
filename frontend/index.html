@@ -292,6 +292,28 @@
       display: none;
     }
 
+    .quick-chip {
+      background: #eef5fc;
+      border: 1.5px solid #0052cc;
+      color: #0052cc;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 4px;
+    }
+    .quick-chip:hover {
+      background: #0052cc;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 82, 204, 0.25);
+    }
+
     .alert {
       padding: 14px 18px;
       border-radius: 8px;
@@ -446,6 +468,7 @@
           <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
             <div id="voiceStatusText">Tap microphone to speak or click "Listen Question" above</div>
           </div>
+          <div id="quickVoiceChips" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 540px; margin-top: 4px;"></div>
           <div style="display: flex; gap: 8px; width: 100%; max-width: 520px; margin-top: 6px;">
             <input type="text" id="transcriptInput" placeholder="Or type your response..." style="flex: 1; padding: 10px 14px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem;" onkeydown="if(event.key==='Enter') submitManualText();" />
             <button onclick="submitManualText()" style="padding: 10px 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Send</button>
@@ -595,11 +618,13 @@
 
     // Speech Recognition Setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let speechRetryCount = 0;
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.onresult = (event) => {
+        speechRetryCount = 0;
         if (event.results && event.results.length > 0) {
           const transcript = event.results[0][0].transcript;
           handleSpeechTranscript(transcript);
@@ -607,13 +632,25 @@
       };
       recognition.onerror = (event) => {
         console.warn('Speech recognition error:', event.error);
+        if (event.error === 'network' && speechRetryCount === 0 && recognition.lang !== 'en-IN') {
+          speechRetryCount = 1;
+          console.log('Regional speech dialect rejected by cloud server. Auto-retrying with en-IN listener...');
+          recognition.lang = 'en-IN';
+          try {
+            recognition.start();
+            return;
+          } catch (retryErr) {
+            console.warn('Silent speech retry failed:', retryErr);
+          }
+        }
+        speechRetryCount = 0;
         stopRecordingUI();
         const statusEl = document.getElementById('voiceStatusText');
         if (statusEl) {
           if (event.error === 'not-allowed') {
             statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
           } else if (event.error === 'network') {
-            statusEl.innerHTML = '<span style="color: #de350b;">⚠️ Speech network timeout. You can tap an option button or type below.</span>';
+            statusEl.innerHTML = '<span style="color: #0052cc; font-weight: 600;">🎙️ Offline Voice Mode Active: Tap your spoken response below or type:</span>';
             highlightOptionsPrompt();
           } else if (event.error === 'no-speech') {
             statusEl.innerHTML = '<span style="color: #ff991f;">⚠️ No voice detected. Please speak closer to the mic or tap an option.</span>';
@@ -628,6 +665,12 @@
     }
 
     function highlightOptionsPrompt() {
+      const chips = document.getElementById('quickVoiceChips');
+      if (chips) {
+        chips.style.transition = 'all 0.3s ease';
+        chips.style.transform = 'scale(1.03)';
+        setTimeout(() => { chips.style.transform = 'scale(1)'; }, 600);
+      }
       const container = document.getElementById('optionsContainer');
       if (container) {
         container.style.transition = 'all 0.3s ease';
@@ -813,6 +856,18 @@
         ? q.localized_options
         : (q.options || []).map(opt => ({ id: opt, label: formatOptionLabel(opt) }));
 
+      const chipsContainer = document.getElementById('quickVoiceChips');
+      if (chipsContainer) {
+        chipsContainer.innerHTML = '';
+        optionItems.forEach(optItem => {
+          const chip = document.createElement('button');
+          chip.className = 'quick-chip';
+          chip.innerHTML = `<span>🗣️ "${optItem.label}"</span>`;
+          chip.onclick = () => submitOption(optItem.id, optItem.label);
+          chipsContainer.appendChild(chip);
+        });
+      }
+
       optionItems.forEach(optItem => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -878,13 +933,14 @@
 
     async function toggleSpeech() {
       if (!recognition) {
-        alert('Web Speech recognition is not supported in this browser. Please use Chrome/Edge or tap the button options above.');
+        highlightOptionsPrompt();
         return;
       }
       if (isRecording) {
         try { recognition.stop(); } catch (e) {}
         stopRecordingUI();
       } else {
+        speechRetryCount = 0;
         const langMap = { kn: 'kn-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', ml: 'ml-IN', en: 'en-IN' };
         recognition.lang = langMap[currentLanguage] || 'en-IN';
         try {
