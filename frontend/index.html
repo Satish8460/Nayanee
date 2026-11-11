@@ -614,6 +614,7 @@
             statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
           } else if (event.error === 'network') {
             statusEl.innerHTML = '<span style="color: #de350b;">⚠️ Speech network timeout. You can tap an option button or type below.</span>';
+            highlightOptionsPrompt();
           } else if (event.error === 'no-speech') {
             statusEl.innerHTML = '<span style="color: #ff991f;">⚠️ No voice detected. Please speak closer to the mic or tap an option.</span>';
           } else {
@@ -624,6 +625,21 @@
       recognition.onend = () => {
         if (isRecording) stopRecordingUI();
       };
+    }
+
+    function highlightOptionsPrompt() {
+      const container = document.getElementById('optionsContainer');
+      if (container) {
+        container.style.transition = 'all 0.3s ease';
+        container.style.transform = 'scale(1.02)';
+        container.style.boxShadow = '0 0 12px rgba(0, 82, 204, 0.25)';
+        setTimeout(() => {
+          container.style.transform = 'scale(1)';
+          container.style.boxShadow = 'none';
+        }, 800);
+      }
+      const inputEl = document.getElementById('transcriptInput');
+      if (inputEl) inputEl.focus();
     }
 
     function selectLang(lang, element) {
@@ -866,24 +882,9 @@
         return;
       }
       if (isRecording) {
-        recognition.stop();
+        try { recognition.stop(); } catch (e) {}
         stopRecordingUI();
       } else {
-        // Explicitly check/request microphone access first
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach(track => track.stop());
-          } catch (micErr) {
-            console.warn('Microphone permission check failed:', micErr);
-            const statusEl = document.getElementById('voiceStatusText');
-            if (statusEl) {
-              statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
-            }
-            return;
-          }
-        }
-
         const langMap = { kn: 'kn-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', ml: 'ml-IN', en: 'en-IN' };
         recognition.lang = langMap[currentLanguage] || 'en-IN';
         try {
@@ -897,6 +898,9 @@
         } catch (e) {
           console.warn('Speech recognition start failed:', e);
           stopRecordingUI();
+          if (e.name === 'InvalidStateError') {
+            try { recognition.stop(); } catch (_) {}
+          }
         }
       }
     }
