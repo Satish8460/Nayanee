@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-title Nayanee - Adaptive Vision Intelligence
+title Nayanee - No-Device Vision Intelligence (ZEISS Theme 2 & 1)
 cls
 echo =====================================================================
-echo    NAYANEE - ADAPTIVE VISION INTELLIGENCE
-echo    ZEISS Hackathon - AI/ML for Advanced Frugal Innovation (AFI)
+echo    NAYANEE - NO-DEVICE VISION INTELLIGENCE & ACCESSIBLE CLINICAL UX
+echo    ZEISS Hackathon - Theme 2 (Primary) & Theme 1 (AFI Complementary)
 echo =====================================================================
 echo.
 echo [1/3] Detecting Python environment...

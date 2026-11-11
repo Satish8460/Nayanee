@@ -7,8 +7,8 @@ from core.config import settings
 
 def main():
     print("=" * 60)
-    print("  NAYANEE (ನಯनी) — ADAPTIVE VISION INTELLIGENCE")
-    print("  ZEISS Hackathon — AI/ML for Advanced Frugal Innovation")
+    print("  NAYANEE (ನಯनी) — NO-DEVICE VISION INTELLIGENCE")
+    print("  ZEISS Hackathon — Theme 2: No-Device Vision Intelligence (Theme 1: AFI)")
     print(f"  Supported Languages: {', '.join(settings.SUPPORTED_LANGUAGES)}")
     print(f"  Starting server at: http://localhost:{settings.API_PORT}")
     print("=" * 60)

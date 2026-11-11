@@ -1,7 +1,13 @@
 # NAYANEE (ನಯನಿ) — TECHNICAL LEARNING GUIDE & PROJECT STATUS REPORT
 
 **Project:** Nayanee (ನಯನಿ) — Adaptive Vision Intelligence  
-**Hackathon Theme:** ZEISS — AI/ML for Advanced Frugal Innovation (AFI)  
+**Primary Hackathon Theme:** **Theme 2: No-Device Vision Intelligence & Accessible Clinical UX**  
+> *"In many retail and rural optical stores, there is no dedicated eye-testing hardware — just a phone or a counter. Design a lightweight way to capture enough information (via voice interview, photo, or simple on-screen tests) to generate a useful lens/eyewear recommendation for a walk-in customer, without any specialized device."*
+
+**Complementary Enabling Theme:** **Theme 1: AI/ML for Advanced Frugal Innovation (AFI)**  
+> *"Advanced Frugal Innovation (AFI) creates frugal products not by downgrading technology, but by using innovative software and algorithms to eliminate dependency on expensive specialized equipment."*
+
+**Supporting Dimension:** **Theme 4: AI-Powered Digital Experiences** (Multilingual voice conversational AI & personalized lifestyle recommendations)  
 **Domain:** Optical Technology, Multilingual Speech AI, Adaptive Clinical Decision Support  
 **Repository:** [https://github.com/Satish8460/Nayanee](https://github.com/Satish8460/Nayanee) (`main` branch)  
 **Document Type:** Technical Learning Guide, Architectural Whitepaper, and Status Report  
@@ -11,17 +17,23 @@
 
 ## 1. Executive Summary & Problem Context
 
-### 1.1 The Real-World Healthcare Challenge
-In many resource-constrained optical retail environments and rural vision screening camps across India and the Global South, there is a severe shortage of qualified optometrists and ophthalmologists. Optical-store sales staff or community vision workers are tasked with understanding a customer's visual difficulties, lifestyle requirements, and previous eyewear history before an optometrist consultation or subjective refraction can take place.
+### 1.1 The Real-World Healthcare Challenge (Theme 2 Direct Alignment)
+In thousands of small retail optical shops, rural vision centers, and community outreach counters across India and the Global South, there is **no dedicated eye-testing hardware** — often just a smartphone or a front counter. 
 
-Today, this process suffers from three fatal systemic failures:
-1. **The Rigid Questionnaire Trap:** Fixed 20-to-30 question forms force every customer through irrelevant questions (e.g. asking a first-time reader about progressive lens adaptation), resulting in customer fatigue and incomplete answers.
-2. **The Language & Literacy Barrier:** Customers speak native Indic languages (Kannada, Hindi, Tamil, Telugu, Malayalam), while retail software and questionnaires are in English. When translated mechanically by machine translation, the clinical intent becomes robotic, confusing, and unnatural.
-3. **The Unsafe "AI Chatbot" Trap:** Generic generative AI chatbots (like raw ChatGPT or Claude instances) hallucinate optical prescriptions, lack deterministic safety triage, require high-cost GPU servers, and violate clinical boundaries by pretending to diagnose eye diseases.
+When walk-in customers arrive, shop attendants struggle to capture accurate functional vision needs because:
+1. **No Equipment Available:** Autorefractors and specialized diagnostic machines cost between \$3,000 and \$15,000, making them impossible for small rural stores to afford.
+2. **The Rigid Questionnaire Trap:** Static paper forms with 20–30 questions fatigue customers with irrelevant queries.
+3. **The Language & Literacy Divide:** Walk-in customers communicate in native Indic languages (Kannada, Hindi, Tamil, Telugu, Malayalam), while software and forms are in English.
+4. **The Unsafe AI Chatbot Trap:** Generic generative LLMs hallucinate unsupported prescriptions, lack clinical boundary checks, and require expensive cloud GPUs.
 
-### 1.2 The ZEISS AFI Philosophy (Advanced Frugal Innovation)
-**Advanced Frugal Innovation is not about making a cheap product by cutting features or lowering quality.**  
-Instead, AFI is about **leveraging clever algorithms, elegant software architecture, and ubiquitous commodity hardware (ordinary smartphones, store laptops, and web browsers)** to deliver clinical-grade value without expensive infrastructure, GPUs, or proprietary hardware.
+Nayanee directly solves **Theme 2** by creating a smartphone-native, voice-first clinical anamnesis system that collects, structures, and converts a walk-in customer's functional visual demands into a clinically actionable profile and pre-refraction lens recommendation — using **zero specialized hardware**.
+
+### 1.2 How Theme 1 (Advanced Frugal Innovation) Empowers Theme 2
+**Advanced Frugal Innovation is not about making a cheap product by removing features or lowering quality.**  
+Nayanee accomplishes the "No-Device" mission of Theme 2 through the "Advanced Frugal Innovation" methodology of Theme 1:
+- Instead of relying on a physical autorefractor or expensive sensor array, Nayanee applies **information-theoretic mathematical entropy scoring** and a **zero-GPU Clinical Spoken-Language Understanding (SLU) engine**.
+- It runs on commodity hardware (ordinary Android smartphones, store laptops, or a \$35 Raspberry Pi) with < 80 MB RAM footprint and sub-millisecond response latency.
+- It guarantees 100% deterministic safety triage (acute red-flag emergency detection) that never hallucinates.
 
 **Nayanee’s Core Product Philosophy:**
 > *Nayanee knows what to ask, what it has learned, what remains uncertain, and when a human medical professional must intervene. It acts as an intelligent functional intake profiler—never a simulated doctor and never an unsupported prescription generator.*

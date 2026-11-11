@@ -1,8 +1,13 @@
 # Nayanee (ನಯनी) — Adaptive Vision Intelligence
 
-> **ZEISS Hackathon — AI/ML for Advanced Frugal Innovation (AFI)**  
-> *A smartphone-based, multilingual adaptive vision-profiling system for optical retail and rural consultation.*
+> **ZEISS Hackathon Primary Theme: Theme 2 — No-Device Vision Intelligence & Accessible Clinical UX**  
+> *"In many retail and rural optical stores, there is no dedicated eye-testing hardware — just a phone or a counter. Design a lightweight way to capture enough information (via voice interview, photo, or simple on-screen tests) to generate a useful lens/eyewear recommendation for a walk-in customer, without any specialized device."*
+>
+> **Complementary Innovation Theme: Theme 1 — AI/ML for Advanced Frugal Innovation (AFI)**  
+> *Leveraging high-order software intelligence, information-theoretic question optimization, and zero-GPU clinical SLU to replace costly specialized optical hardware with ordinary smartphones.*
 
+[![Theme 2 Primary](https://img.shields.io/badge/ZEISS%20Theme%202-No--Device%20Vision%20Intelligence-blue.svg)](#1-the-no-device-challenge--frugal-innovation)
+[![Theme 1 Complementary](https://img.shields.io/badge/ZEISS%20Theme%201-Advanced%20Frugal%20Innovation-purple.svg)](#1-the-no-device-challenge--frugal-innovation)
 [![CI Test Suite](https://img.shields.io/badge/pytest-38%20passed-brightgreen.svg)](#testing)
 [![Languages Supported](https://img.shields.io/badge/languages-KN%20%7C%20HI%20%7C%20TA%20%7C%20TE%20%7C%20ML%20%7C%20EN-blue.svg)](#multilingual-voice-first-interaction)
 [![Frugal Hardware](https://img.shields.io/badge/hardware-Zero%20GPU%20%7C%20Budget%20Android-orange.svg)](#frugal-architecture)
@@ -21,7 +26,7 @@ This automatically:
 
 ### Windows 1-Click Verification:
 Double-click [`run_tests.bat`](run_tests.bat).
-Executes all **30 automated unit and integration tests** and runs the end-to-end multi-language simulation script (`demo_e2e.py`).
+Executes all **38 automated unit and integration tests** and runs the end-to-end multi-language simulation script (`demo_e2e.py`).
 
 ---
 

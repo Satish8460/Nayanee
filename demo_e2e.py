@@ -104,8 +104,8 @@ def run_scenario_tamil_contradiction():
 
 def main():
     print("=" * 65)
-    print("   NAYANEE (ನಯनी) — COMPLETE SIX-ITERATION DEMONSTRATION")
-    print("   Multilingual Adaptive Vision Intelligence")
+    print("   NAYANEE (ನಯनी) — NO-DEVICE VISION INTELLIGENCE (AFI)")
+    print("   ZEISS Hackathon — Theme 2: No-Device Vision Intelligence (Theme 1: AFI)")
     print("=" * 65)
 
     run_scenario_kannada_presbyope()
