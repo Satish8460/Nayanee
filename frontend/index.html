@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nayanee (ನಯनी) — Adaptive Vision Intelligence</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0052cc">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&family=Noto+Sans+Malayalam:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0052cc;
+      --primary-hover: #0747a6;
+      --primary-light: #deebff;
+      --accent: #00875a;
+      --danger: #de350b;
+      --danger-light: #ffebe6;
+      --warning: #ffab00;
+      --warning-light: #fff0b3;
+      --bg: #f4f5f7;
+      --card-bg: #ffffff;
+      --text-main: #172b4d;
+      --text-muted: #5e6c84;
+      --border: #dfe1e6;
+      --radius: 12px;
+      --shadow: 0 4px 12px rgba(9, 30, 66, 0.08);
+      --font-stack: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-stack);
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: #002b66;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      background: #0065ff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 22px;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .brand-title p {
+      font-size: 0.75rem;
+      color: #b3d4ff;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-tab.active {
+      background: #fff;
+      color: var(--primary);
+    }
+
+    main {
+      max-width: 740px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (max-width: 480px) {
+      .lang-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .lang-card {
+      border: 2px solid var(--border);
+      padding: 16px 12px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fafbfc;
+    }
+    .lang-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .lang-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      font-weight: 700;
+    }
+    .lang-card .autonym {
+      font-size: 1.25rem;
+      display: block;
+      margin-bottom: 4px;
+      color: #0747a6;
+    }
+    .lang-card .eng-name {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 200px;
+    }
+
+    .bubble {
+      padding: 16px 18px;
+      border-radius: 14px;
+      max-width: 90%;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .bubble.bot {
+      background: #ebf2fa;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      border: 1px solid #d0e2ff;
+    }
+    .bubble.bot .q-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #091e42;
+      margin-bottom: 10px;
+    }
+    .bubble.bot .q-audio-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0052cc;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0,82,204,0.25);
+    }
+    .bubble.bot .q-audio-btn:hover {
+      background: #0747a6;
+      transform: translateY(-1px);
+    }
+    .bubble.bot .q-audio-btn.playing {
+      background: #00875a;
+      animation: pulse 1s infinite;
+    }
+    .bubble.user {
+      background: var(--primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+      font-weight: 500;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .option-btn {
+      background: #fff;
+      border: 1.5px solid #c1c7d0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: #f4f8ff;
+      color: var(--primary);
+    }
+    .option-btn:active {
+      transform: scale(0.99);
+    }
+
+    .voice-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 0 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    .mic-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .mic-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 82, 204, 0.3);
+      transition: all 0.2s;
+    }
+    .mic-btn.recording {
+      background: var(--danger);
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(222, 53, 11, 0.4); }
+      70% { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(222, 53, 11, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(222, 53, 11, 0); }
+    }
+
+    #waveCanvas {
+      width: 140px;
+      height: 30px;
+      display: none;
+    }
+
+    .alert {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .alert-danger {
+      background: var(--danger-light);
+      border-left: 4px solid var(--danger);
+      color: #bf2600;
+    }
+    .alert-warning {
+      background: var(--warning-light);
+      border-left: 4px solid var(--warning);
+      color: #974f00;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-urgent { background: #ffebe6; color: #de350b; }
+    .badge-pending { background: #deebff; color: #0052cc; }
+    .badge-approved { background: #e3fcef; color: #00875a; }
+
+    .profile-item {
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .profile-item:hover {
+      background: #fafbfc;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">न</div>
+      <div class="brand-title">
+        <h1>Nayanee (ನಯनी)</h1>
+        <p>Adaptive Vision Intelligence &bull; ZEISS AFI</p>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tabCustomerBtn" onclick="switchTab('customer')">Customer Intake</button>
+      <button class="nav-tab" id="tabOptoBtn" onclick="switchTab('opto')">Optometrist Review</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- CUSTOMER VIEW -->
+    <section id="customerView">
+      <div class="card" id="langCard">
+        <h2>Choose Your Preferred Language</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">ನಿಮ್ಮ ಮಾತೃಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ &bull; अपनी भाषा चुनें &bull; உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்</p>
+        
+        <div class="lang-grid">
+          <div class="lang-card selected" onclick="selectLang('kn', this)">
+            <span class="autonym">ಕನ್ನಡ</span>
+            <span class="eng-name">Kannada</span>
+          </div>
+          <div class="lang-card" onclick="selectLang('hi', this)">
+            <span class="autonym">हिन्दी</span>
+            <span class="eng-name">Hindi</span>
+          </div>
+          <div class="lang-card" onclick="selectLang('ta', this)">
+            <span class="autonym">தமிழ்</span>
+            <span class="eng-name">Tamil</span>
+          </div>
+          <div class="lang-card" onclick="selectLang('te', this)">
+            <span class="autonym">తెలుగు</span>
+            <span class="eng-name">Telugu</span>
+          </div>
+          <div class="lang-card" onclick="selectLang('ml', this)">
+            <span class="autonym">മലയാളം</span>
+            <span class="eng-name">Malayalam</span>
+          </div>
+          <div class="lang-card" onclick="selectLang('en', this)">
+            <span class="autonym">English</span>
+            <span class="eng-name">English</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <h3 style="margin-bottom: 4px; font-size: 1.05rem;">👤 Patient Information</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">Enter details to initialize consultation records for the Optometrist.</p>
+          
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #344563;">Patient Full Name *</label>
+              <input type="text" id="patientNameInput" placeholder="e.g. Ramesh Kumar" style="width: 100%; padding: 10px 12px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem;" />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #344563;">Age (Years)</label>
+              <input type="number" id="patientAgeInput" placeholder="e.g. 52" min="1" max="120" style="width: 100%; padding: 10px 12px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem;" />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #344563;">Gender</label>
+              <select id="patientGenderSelect" style="width: 100%; padding: 10px 12px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem; background: white;">
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #344563;">Phone or Store Reference No. (Optional)</label>
+            <input type="text" id="patientPhoneInput" placeholder="e.g. 9876543210 / REF-102" style="width: 100%; padding: 10px 12px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem;" />
+          </div>
+        </div>
+
+        <button onclick="startIntake()" style="width: 100%; margin-top: 20px; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;">
+          Start Vision Interview &rarr;
+        </button>
+      </div>
+
+      <div class="card" id="interviewCard" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);" id="turnIndicator">Turn 1</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-left: 8px;" id="activePatientBadge">👤 Patient: Anonymous</span>
+          </div>
+          <span id="sessionStatusBadge" class="badge badge-pending">Active Anamnesis</span>
+        </div>
+
+        <div id="alertBanner" style="display: none;"></div>
+
+        <div class="chat-container" id="chatArea"></div>
+
+        <div class="options-grid" id="optionsContainer"></div>
+
+        <div class="voice-controls">
+          <div class="mic-row">
+            <button class="mic-btn" id="micBtn" onclick="toggleSpeech()" title="Tap to speak or listen">
+              🎤
+            </button>
+            <canvas id="waveCanvas" width="140" height="30"></canvas>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+            <div id="voiceStatusText">Tap microphone to speak or click "Listen Question" above</div>
+          </div>
+          <div style="display: flex; gap: 8px; width: 100%; max-width: 520px; margin-top: 6px;">
+            <input type="text" id="transcriptInput" placeholder="Or type your response..." style="flex: 1; padding: 10px 14px; border: 1.5px solid #c1c7d0; border-radius: 8px; font-size: 0.95rem;" onkeydown="if(event.key==='Enter') submitManualText();" />
+            <button onclick="submitManualText()" style="padding: 10px 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="summaryCard" style="display: none;">
+        <div style="text-align: center; padding: 20px 0;">
+          <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+          <h2>Functional Vision Profile Created for <span id="summaryPatientName" style="color: var(--primary);">Patient</span></h2>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">The functional needs and clinical flags have been structured and sent to the Optometrist triage queue.</p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button onclick="switchTab('opto')" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+              🔍 View in Optometrist Portal
+            </button>
+            <button onclick="startNewSession()" style="padding: 12px 24px; background: #ebecf0; color: #172b4d; border: 1px solid #c1c7d0; border-radius: 8px; font-weight: 600; cursor: pointer;">
+              ➕ Start New Patient Session
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTOMETRIST PORTAL VIEW -->
+    <section id="optoView" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h2>Optometrist Triage Dashboard</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Review customer functional profiles, contradictions & clinical alerts</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="seedDemoCases()" style="padding: 8px 14px; background: #ebf2fa; border: 1px solid #0052cc; color: #0052cc; font-weight: 600; border-radius: 6px; cursor: pointer;">
+              + Load Sample Cases
+            </button>
+            <button onclick="loadProfiles()" style="padding: 8px 14px; background: #fff; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-weight: 500;">
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div id="profilesListContainer">Loading profiles...</div>
+      </div>
+
+      <div class="card" id="profileDetailCard" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h3 id="detailTitle">Profile Clinical Review</h3>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="openPrintableSlip()" style="padding: 6px 12px; background: #fff; border: 1.5px solid #0052cc; color: #0052cc; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+              🖨️ Print Intake Slip
+            </button>
+            <button onclick="copyClinicalSummary()" style="padding: 6px 12px; background: #0052cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+              📋 Copy EHR Note
+            </button>
+          </div>
+        </div>
+        <div id="detailContent"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+      });
+    }
+
+    let currentLanguage = 'kn';
+    let currentSessionId = null;
+    let currentQuestion = null;
+    let isRecording = false;
+    let recognition = null;
+    let activeProfileId = null;
+
+    // Web Audio API Context (initialized/resumed on user gesture)
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Melodic Earcon & Sound Synthesizer (guaranteed sound on any device)
+    function playAudioTone(freqs, duration = 0.15, type = 'sine') {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(f, ctx.currentTime + idx * (duration / freqs.length));
+          gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * (duration / freqs.length));
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx + 1) * (duration / freqs.length));
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * (duration / freqs.length));
+          osc.stop(ctx.currentTime + (idx + 1) * (duration / freqs.length));
+        });
+      } catch (err) {}
+    }
+
+    function playEarcon(type) {
+      if (type === 'turn') playAudioTone([523, 659, 784], 0.25);
+      else if (type === 'alert') playAudioTone([350, 220], 0.3, 'sawtooth');
+      else if (type === 'success') playAudioTone([440, 554, 659, 880], 0.35);
+      else if (type === 'speak') playAudioTone([400, 600], 0.18);
+    }
+
+    // Best Voice Finder across Windows, Android, Chrome & Edge
+    function getBestVoiceForLanguage(langCode) {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      const langMap = { kn: 'kn-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', ml: 'ml-IN', en: 'en-IN' };
+      const targetLang = (langMap[langCode] || 'en-IN').toLowerCase();
+      const prefix = langCode.toLowerCase();
+
+      // 1. Direct match (e.g. kn-IN)
+      let match = voices.find(v => v.lang.toLowerCase() === targetLang);
+      if (match) return match;
+
+      // 2. Prefix match (e.g. kn)
+      match = voices.find(v => v.lang.toLowerCase().startsWith(prefix));
+      if (match) return match;
+
+      // 3. Any Indian localized voice (e.g. Hindi or Indian English)
+      match = voices.find(v => v.lang.toLowerCase().includes('in') || v.name.toLowerCase().includes('india'));
+      if (match) return match;
+
+      // 4. Default voice
+      return voices.find(v => v.default) || voices[0];
+    }
+
+    // Force voice list reload (Chrome quirk)
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
+    // Speech Recognition Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onresult = (event) => {
+        if (event.results && event.results.length > 0) {
+          const transcript = event.results[0][0].transcript;
+          handleSpeechTranscript(transcript);
+        }
+      };
+      recognition.onerror = (event) => {
+        console.warn('Speech recognition error:', event.error);
+        stopRecordingUI();
+        const statusEl = document.getElementById('voiceStatusText');
+        if (statusEl) {
+          if (event.error === 'not-allowed') {
+            statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
+          } else if (event.error === 'network') {
+            statusEl.innerHTML = '<span style="color: #de350b;">⚠️ Speech network timeout. You can tap an option button or type below.</span>';
+          } else if (event.error === 'no-speech') {
+            statusEl.innerHTML = '<span style="color: #ff991f;">⚠️ No voice detected. Please speak closer to the mic or tap an option.</span>';
+          } else {
+            statusEl.innerText = `⚠️ Speech note: ${event.error}. You can tap an option directly.`;
+          }
+        }
+      };
+      recognition.onend = () => {
+        if (isRecording) stopRecordingUI();
+      };
+    }
+
+    function selectLang(lang, element) {
+      currentLanguage = lang;
+      document.querySelectorAll('.lang-card').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      playEarcon('turn');
+    }
+
+    function switchTab(tab) {
+      playEarcon('turn');
+      if (tab === 'customer') {
+        document.getElementById('customerView').style.display = 'block';
+        document.getElementById('optoView').style.display = 'none';
+        document.getElementById('tabCustomerBtn').classList.add('active');
+        document.getElementById('tabOptoBtn').classList.remove('active');
+      } else {
+        document.getElementById('customerView').style.display = 'none';
+        document.getElementById('optoView').style.display = 'block';
+        document.getElementById('tabOptoBtn').classList.add('active');
+        document.getElementById('tabCustomerBtn').classList.remove('active');
+        loadProfiles();
+      }
+    }
+
+    async function startIntake() {
+      try {
+        const pName = document.getElementById('patientNameInput').value.trim() || 'Anonymous Patient';
+        const pAge = parseInt(document.getElementById('patientAgeInput').value) || null;
+        const pGender = document.getElementById('patientGenderSelect').value || null;
+        const pPhone = document.getElementById('patientPhoneInput').value.trim() || null;
+
+        playEarcon('turn');
+        const resp = await fetch('/api/v1/session/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: currentLanguage,
+            patient_name: pName,
+            patient_age: pAge,
+            patient_gender: pGender,
+            patient_phone: pPhone
+          })
+        });
+        const data = await resp.json();
+        currentSessionId = data.session_id;
+        document.getElementById('langCard').style.display = 'none';
+        document.getElementById('interviewCard').style.display = 'block';
+
+        const badgeEl = document.getElementById('activePatientBadge');
+        if (badgeEl) {
+          const ageStr = pAge ? ` (${pAge}y)` : '';
+          badgeEl.innerText = `👤 Patient: ${pName}${ageStr}`;
+        }
+
+        renderQuestion(data.current_question, data.turn_index);
+      } catch (err) {
+        alert('Could not start intake: ' + err);
+      }
+    }
+
+    function startNewSession() {
+      currentSessionId = null;
+      currentQuestion = null;
+      document.getElementById('patientNameInput').value = '';
+      document.getElementById('patientAgeInput').value = '';
+      document.getElementById('patientPhoneInput').value = '';
+      document.getElementById('patientGenderSelect').value = '';
+      document.getElementById('summaryCard').style.display = 'none';
+      document.getElementById('interviewCard').style.display = 'none';
+      document.getElementById('langCard').style.display = 'block';
+      playEarcon('turn');
+    }
+
+    const UI_I18N = {
+      listenBtn: {
+        kn: "🔊 ಪ್ರಶ್ನೆ ಆಲಿಸಿ (ಕೇಳಿ)",
+        hi: "🔊 प्रश्न सुनें",
+        ta: "🔊 கேள்வியைக் கேளுங்கள்",
+        te: "🔊 ప్రశ్న వినండి",
+        ml: "🔊 ചോദ്യം കേൾക്കുക",
+        en: "🔊 Listen Question"
+      },
+      micPrompt: {
+        kn: "ಧ್ವನಿ ಮೂಲಕ ಉತ್ತರಿಸಲು ಮೈಕ್ ಒತ್ತಿ ಅಥವಾ ಮೇಲಿನ ಆಯ್ಕೆಗಳನ್ನು ಮುಟ್ಟಿ",
+        hi: "बोलकर उत्तर देने के लिए माइक दबाएं या ऊपर विकल्प चुनें",
+        ta: "குரல் மூலம் பதிலளிக்க மைக்கை அழுத்தவும் அல்லது விருப்பங்களைத் தொடவும்",
+        te: "మాట్లాడటానికి మైక్ నొక్కండి లేదా పై ఎంపికలను తాకండి",
+        ml: "സംസാരിക്കാൻ മൈക്ക് അമർത്തുക അല്ലെങ്കിൽ ഓപ്ഷനുകൾ തൊടുക",
+        en: "Tap microphone to speak or tap the options above"
+      },
+      listeningStatus: {
+        kn: "ನಿಮ್ಮ ಧ್ವನಿಯನ್ನು ಆಲಿಸಲಾಗುತ್ತಿದೆ... ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಿ",
+        hi: "आपकी आवाज़ सुनी जा रही है... स्पष्ट बोलें",
+        ta: "உங்கள் குரலைக் கேட்கிறது... தெளிவாகப் பேசுங்கள்",
+        te: "మీ స్వరాన్ని వింటోంది... స్పష్టంగా మాట్లాడండి",
+        ml: "ശ്രദ്ധിക്കുന്നു... വ്യക്തമായി സംസാരിക്കുക",
+        en: "Listening to your voice... Speak clearly."
+      },
+      adapting: {
+        kn: "ಮುಂದಿನ ಪ್ರಶ್ನೆ ಹೊಂದಿಸಲಾಗುತ್ತಿದೆ...",
+        hi: "अगला प्रश्न तैयार हो रहा है...",
+        ta: "அடுத்த கேள்வி தயாராகிறது...",
+        te: "తదుపరి ప్రశ్న సిద్ధమవుతోంది...",
+        ml: "അടുത്ത ചോദ്യം ഒരുങ്ങുന്നു...",
+        en: "Adapting questions..."
+      },
+      turn: {
+        kn: "ಹಂತ",
+        hi: "प्रश्न",
+        ta: "கேள்வி",
+        te: "ప్రశ్న",
+        ml: "ചോദ്യം",
+        en: "Turn"
+      },
+      inputPlaceholder: {
+        kn: "ಅಥವಾ ನಿಮ್ಮ ಸಮಸ್ಯೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...",
+        hi: "या अपनी समस्या यहाँ टाइप करें...",
+        ta: "அல்லது உங்கள் பிரச்சனையை இங்கே தட்டச்சு செய்யவும்...",
+        te: "లేదా మీ సమస్యను ఇక్కడ టైప్ చేయండి...",
+        ml: "അല്ലെങ്കിൽ നിങ്ങളുടെ പ്രശ്നം ഇവിടെ ടൈപ്പ് ചെയ്യുക...",
+        en: "Or type your response here..."
+      }
+    };
+
+    function renderQuestion(q, turnIndex) {
+      currentQuestion = q;
+      const turnLabel = (UI_I18N.turn[currentLanguage] || "Turn");
+      document.getElementById('turnIndicator').innerText = `${turnLabel} ${turnIndex}`;
+
+      const inputEl = document.getElementById('transcriptInput');
+      if (inputEl) {
+        inputEl.placeholder = UI_I18N.inputPlaceholder[currentLanguage] || UI_I18N.inputPlaceholder.en;
+        inputEl.value = '';
+      }
+      
+      const listenText = UI_I18N.listenBtn[currentLanguage] || UI_I18N.listenBtn.en;
+      const chatArea = document.getElementById('chatArea');
+      chatArea.innerHTML = `
+        <div class="bubble bot">
+          <div class="q-text">${q.text}</div>
+          <button class="q-audio-btn" id="listenBtn" onclick="speakText('${q.text.replace(/'/g, "\\'")}')">
+            ${listenText}
+          </button>
+          <div id="audioStatusIndicator" style="font-size: 0.75rem; color: #0052cc; margin-top: 6px; display: none;"></div>
+        </div>
+      `;
+
+      // Update mic prompt helper text in native language
+      const voiceStatus = document.getElementById('voiceStatusText');
+      if (voiceStatus && !isRecording) {
+        voiceStatus.innerText = UI_I18N.micPrompt[currentLanguage] || UI_I18N.micPrompt.en;
+      }
+
+      // Pre-warm AudioContext on user interaction
+      getAudioContext();
+
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = '';
+
+      const optionItems = (q.localized_options && q.localized_options.length > 0)
+        ? q.localized_options
+        : (q.options || []).map(opt => ({ id: opt, label: formatOptionLabel(opt) }));
+
+      optionItems.forEach(optItem => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span>${optItem.label}</span> <span>&rarr;</span>`;
+        btn.onclick = () => submitOption(optItem.id, optItem.label);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function formatOptionLabel(opt) {
+      return opt.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    async function submitOption(selectedOptionId, displayLabel) {
+      try {
+        playEarcon('turn');
+        const chatArea = document.getElementById('chatArea');
+        const bubbleText = displayLabel || formatOptionLabel(selectedOptionId);
+        chatArea.innerHTML += `<div class="bubble user">${bubbleText}</div>`;
+        
+        const adaptingText = UI_I18N.adapting[currentLanguage] || UI_I18N.adapting.en;
+        document.getElementById('optionsContainer').innerHTML = `<div style="text-align: center; color: var(--text-muted);">${adaptingText}</div>`;
+
+        const resp = await fetch(`/api/v1/session/${currentSessionId}/turn`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question_id: currentQuestion.id,
+            selected_option: selectedOptionId,
+            confidence: 1.0
+          })
+        });
+        const data = await resp.json();
+
+        if (data.red_flags_count > 0) {
+          playEarcon('alert');
+          const banner = document.getElementById('alertBanner');
+          banner.className = 'alert alert-danger';
+          banner.innerHTML = '<strong>⚠️ Urgent Clinical Flag:</strong> Immediate medical examination required. Routine optical intake suspended.';
+          banner.style.display = 'flex';
+        } else if (data.contradictions_count > 0) {
+          playEarcon('alert');
+          const banner = document.getElementById('alertBanner');
+          banner.className = 'alert alert-warning';
+          banner.innerHTML = '<strong>ℹ️ Inconsistency Detected:</strong> Clarifying responses for optometrist review.';
+          banner.style.display = 'flex';
+        }
+
+        if (data.status === 'completed' || data.status === 'urgent_escalation') {
+          playEarcon('success');
+          const pName = document.getElementById('patientNameInput').value.trim() || 'Patient';
+          const summaryNameEl = document.getElementById('summaryPatientName');
+          if (summaryNameEl) summaryNameEl.innerText = pName;
+          document.getElementById('interviewCard').style.display = 'none';
+          document.getElementById('summaryCard').style.display = 'block';
+        } else if (data.current_question) {
+          renderQuestion(data.current_question, data.turn_index);
+        }
+      } catch (err) {
+        alert('Error processing turn: ' + err);
+      }
+    }
+
+    async function toggleSpeech() {
+      if (!recognition) {
+        alert('Web Speech recognition is not supported in this browser. Please use Chrome/Edge or tap the button options above.');
+        return;
+      }
+      if (isRecording) {
+        recognition.stop();
+        stopRecordingUI();
+      } else {
+        // Explicitly check/request microphone access first
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(track => track.stop());
+          } catch (micErr) {
+            console.warn('Microphone permission check failed:', micErr);
+            const statusEl = document.getElementById('voiceStatusText');
+            if (statusEl) {
+              statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
+            }
+            return;
+          }
+        }
+
+        const langMap = { kn: 'kn-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', ml: 'ml-IN', en: 'en-IN' };
+        recognition.lang = langMap[currentLanguage] || 'en-IN';
+        try {
+          playEarcon('speak');
+          recognition.start();
+          isRecording = true;
+          document.getElementById('micBtn').classList.add('recording');
+          document.getElementById('voiceStatusText').innerText = UI_I18N.listeningStatus[currentLanguage] || UI_I18N.listeningStatus.en;
+          document.getElementById('waveCanvas').style.display = 'block';
+          startWaveAnim();
+        } catch (e) {
+          console.warn('Speech recognition start failed:', e);
+          stopRecordingUI();
+        }
+      }
+    }
+
+    function stopRecordingUI() {
+      isRecording = false;
+      document.getElementById('micBtn').classList.remove('recording');
+      document.getElementById('voiceStatusText').innerText = UI_I18N.micPrompt[currentLanguage] || UI_I18N.micPrompt.en;
+      document.getElementById('waveCanvas').style.display = 'none';
+    }
+
+    async function handleSpeechTranscript(transcript) {
+      stopRecordingUI();
+      if (!transcript || !transcript.trim()) return;
+
+      playEarcon('turn');
+      const chatArea = document.getElementById('chatArea');
+      chatArea.innerHTML += `<div class="bubble user" style="border: 1.5px dashed #0052cc; background: #eef5fc; color: #0052cc;">🎙️ <em>"${transcript}"</em></div>`;
+      
+      const statusEl = document.getElementById('voiceStatusText');
+      if (statusEl) statusEl.innerText = 'Analyzing spoken response...';
+      const adaptingText = UI_I18N.adapting[currentLanguage] || UI_I18N.adapting.en;
+      document.getElementById('optionsContainer').innerHTML = `<div style="text-align: center; color: var(--primary); font-weight: 600;">${adaptingText}</div>`;
+
+      try {
+        const matchResp = await fetch('/api/v1/session/analyze-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question_id: currentQuestion.id,
+            transcript: transcript,
+            language: currentLanguage
+          })
+        });
+        const matchData = await matchResp.json();
+        await submitOption(matchData.selected_option, `${matchData.label} (${Math.round(matchData.confidence * 100)}% match)`);
+      } catch (err) {
+        console.warn('Spoken analyzer network error:', err);
+        let chosenId = currentQuestion.options[0];
+        let chosenLabel = chosenId;
+        if (currentQuestion.localized_options && currentQuestion.localized_options.length > 0) {
+          chosenId = currentQuestion.localized_options[0].id;
+          chosenLabel = currentQuestion.localized_options[0].label;
+        }
+        await submitOption(chosenId, chosenLabel);
+      }
+    }
+
+    function submitManualText() {
+      const input = document.getElementById('transcriptInput');
+      if (!input || !input.value.trim()) return;
+      const val = input.value.trim();
+      input.value = '';
+      handleSpeechTranscript(val);
+    }
+
+    // Real Native Voice Streamer with Multi-Tier Fallback
+    let currentAudioObj = null;
+
+    function speakText(text) {
+      const btn = document.getElementById('listenBtn');
+      const indicator = document.getElementById('audioStatusIndicator');
+
+      if (btn) btn.classList.add('playing');
+      if (indicator) {
+        indicator.style.display = 'block';
+        indicator.innerText = '🔊 Loading native voice...';
+      }
+
+      if (currentAudioObj) {
+        currentAudioObj.pause();
+        currentAudioObj = null;
+      }
+
+      const audioUrl = `/api/v1/session/speak?text=${encodeURIComponent(text)}&lang=${currentLanguage}`;
+      const audio = new Audio(audioUrl);
+      currentAudioObj = audio;
+
+      audio.onplay = () => {
+        if (indicator) indicator.innerText = '🔊 Speaking in native voice...';
+        document.getElementById('waveCanvas').style.display = 'block';
+        startWaveAnim();
+      };
+
+      audio.onended = () => {
+        if (btn) btn.classList.remove('playing');
+        if (indicator) indicator.style.display = 'none';
+        document.getElementById('waveCanvas').style.display = 'none';
+      };
+
+      audio.onerror = () => {
+        fallbackBrowserSpeech(text, btn, indicator);
+      };
+
+      audio.play().catch(() => {
+        fallbackBrowserSpeech(text, btn, indicator);
+      });
+    }
+
+    function fallbackBrowserSpeech(text, btn, indicator) {
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.resume();
+          const utterance = new SpeechSynthesisUtterance(text);
+          const bestVoice = getBestVoiceForLanguage(currentLanguage);
+          if (bestVoice) {
+            utterance.voice = bestVoice;
+            utterance.lang = bestVoice.lang;
+          }
+          utterance.onend = () => {
+            if (btn) btn.classList.remove('playing');
+            if (indicator) indicator.style.display = 'none';
+          };
+          utterance.onerror = () => {
+            playAudioTone([440, 554, 659], 0.25);
+            if (btn) btn.classList.remove('playing');
+            if (indicator) indicator.innerText = '🔊 Audio tone played.';
+          };
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          playAudioTone([440, 554, 659], 0.25);
+          if (btn) btn.classList.remove('playing');
+        }
+      } else {
+        playAudioTone([440, 554, 659], 0.25);
+        if (btn) btn.classList.remove('playing');
+      }
+    }
+
+    // Audio Visualizer Animation
+    let wavePhase = 0;
+    function startWaveAnim() {
+      const canvas = document.getElementById('waveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      function draw() {
+        if (!isRecording) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.strokeStyle = '#de350b';
+        ctx.lineWidth = 2.5;
+        for (let x = 0; x < canvas.width; x++) {
+          const y = canvas.height / 2 + Math.sin(x * 0.15 + wavePhase) * 10;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        wavePhase += 0.2;
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+    }
+
+    function openPrintableSlip() {
+      if (!activeProfileId) return;
+      window.open(`/api/v1/export/profile/${activeProfileId}/printable-slip`, '_blank');
+    }
+
+    async function seedDemoCases() {
+      try {
+        playEarcon('turn');
+        await fetch('/api/v1/profiles/seed-demo', { method: 'POST' });
+        loadProfiles();
+      } catch (err) {
+        alert('Could not seed demo cases: ' + err);
+      }
+    }
+
+    async function copyClinicalSummary() {
+      if (!activeProfileId) return;
+      try {
+        playEarcon('turn');
+        const resp = await fetch(`/api/v1/export/profile/${activeProfileId}/summary-text`);
+        const text = await resp.text();
+        await navigator.clipboard.writeText(text);
+        alert('EHR Clinical Summary copied to clipboard!');
+      } catch (err) {
+        alert('Clipboard copy failed: ' + err);
+      }
+    }
+
+    async function loadProfiles() {
+      const container = document.getElementById('profilesListContainer');
+      try {
+        const resp = await fetch('/api/v1/profiles');
+        const profiles = await resp.json();
+        if (profiles.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted);">No customer profiles completed yet. Click <strong>+ Load Sample Cases</strong> above to load demonstration cases.</p>';
+          return;
+        }
+        container.innerHTML = profiles.map(p => `
+          <div class="profile-item" onclick="inspectProfile('${p.profile_id}')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>👤 ${p.patient_name || 'Anonymous Patient'}</strong>
+              <span class="badge ${p.has_red_flags ? 'badge-urgent' : 'badge-pending'}">${p.review_status}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+              ${p.patient_age ? p.patient_age + ' yrs &bull; ' : ''}${p.patient_gender ? p.patient_gender + ' &bull; ' : ''}Lang: ${p.language.toUpperCase()} &bull; Questions: ${p.total_questions} &bull; ${p.has_red_flags ? '🚨 Red Flag' : (p.has_contradictions ? '⚠️ Inconsistency' : 'Clean Trace')}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerText = 'Failed to load profiles: ' + err;
+      }
+    }
+
+    async function inspectProfile(profileId) {
+      activeProfileId = profileId;
+      playEarcon('turn');
+      const detailCard = document.getElementById('profileDetailCard');
+      const content = document.getElementById('detailContent');
+      try {
+        const resp = await fetch(`/api/v1/profiles/${profileId}`);
+        const data = await resp.json();
+        const p = data.profile || data;
+        const guidance = data.lifestyle_guidance || [];
+
+        detailCard.style.display = 'block';
+
+        let redFlagsHtml = '';
+        if (p.red_flags && p.red_flags.length > 0) {
+          redFlagsHtml = `
+            <div class="alert alert-danger" style="margin-bottom: 16px;">
+              <div>
+                <strong>🚨 CRITICAL MEDICAL ESCALATION:</strong>
+                ${p.red_flags.map(rf => `<div>• ${rf.symptom}: ${rf.clinical_note}</div>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        let contraHtml = '';
+        if (p.contradictions && p.contradictions.length > 0) {
+          contraHtml = `
+            <div class="alert alert-warning" style="margin-bottom: 16px;">
+              <div>
+                <strong>⚠️ CONTRADICTORY RESPONSES DETECTED:</strong>
+                ${p.contradictions.map(c => `<div>• ${c.explanation}</div>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        let guidanceHtml = '';
+        if (guidance.length > 0) {
+          guidanceHtml = `
+            <div style="margin: 16px 0; background: #f0f7ff; border: 1px solid #b3d4ff; border-radius: 8px; padding: 14px;">
+              <h4 style="color: #0052cc; margin-bottom: 8px;">Optical & Lifestyle Design Considerations (Pre-Refraction)</h4>
+              ${guidance.map(g => `
+                <div style="margin-bottom: 8px; font-size: 0.9rem;">
+                  <strong>[${g.category}] ${g.finding}</strong><br>
+                  <span style="color: #172b4d;">&bull; Consideration: ${g.consideration}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        const patientBanner = `
+          <div style="background: #ebf3fc; border: 1.5px solid #b3d4ff; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <strong style="font-size: 1.1rem; color: #002b66;">👤 ${p.patient_name || 'Anonymous Patient'}</strong>
+              <div style="font-size: 0.85rem; color: #5e6c84; margin-top: 2px;">
+                ${p.patient_age ? p.patient_age + ' yrs old &bull; ' : ''}${p.patient_gender ? p.patient_gender + ' &bull; ' : ''}${p.patient_phone ? 'Phone/Ref: ' + p.patient_phone + ' &bull; ' : ''}Lang: ${p.customer_language.toUpperCase()}
+              </div>
+            </div>
+            <div>
+              <span class="badge ${p.review_status === 'urgent_medical_escalation' ? 'badge-urgent' : 'badge-pending'}">${p.review_status}</span>
+            </div>
+          </div>
+        `;
+
+        content.innerHTML = `
+          ${patientBanner}
+          ${redFlagsHtml}
+          ${contraHtml}
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+            <div style="background: #fafbfc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
+              <strong>Functional Demands:</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                Near Reading: ${p.near_vision_status.mobile_reading_status || 'unassessed'}<br>
+                Presbyopic Indicator: ${p.near_vision_status.has_presbyopic_indicators ? 'YES' : 'NO'}<br>
+                Distance Clarity: ${p.distance_vision_status.clarity_rating || 'unassessed'}<br>
+                Night Glare: ${p.distance_vision_status.night_glare_difficulty || 'unassessed'}
+              </div>
+            </div>
+            <div style="background: #fafbfc; border: 1px solid var(--border); padding: 12px; border-radius: 6px;">
+              <strong>Lifestyle & Eyewear:</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                Daily Screen Hours: ${p.lifestyle_occupational_context.daily_screen_hours || 'unassessed'}<br>
+                Outdoor Exposure: ${p.lifestyle_occupational_context.outdoor_sun_exposure || 'unassessed'}<br>
+                Current Eyewear: ${p.eyewear_history.current_modality || 'never_worn'}<br>
+                Glasses Age: ${p.eyewear_history.glasses_age || 'n/a'}
+              </div>
+            </div>
+          </div>
+
+          ${guidanceHtml}
+
+          <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px;">
+            <h4>Optometrist Clinical Action</h4>
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <button onclick="reviewDecision('${p.profile_id}', 'reviewed_approved')" style="padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                ✓ Approve for Refraction
+              </button>
+              <button onclick="reviewDecision('${p.profile_id}', 'clarification_requested')" style="padding: 8px 16px; background: var(--warning); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                ? Request Clarification
+              </button>
+              <button onclick="reviewDecision('${p.profile_id}', 'urgent_medical_escalation')" style="padding: 8px 16px; background: var(--danger); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                🚨 Emergency Referral
+              </button>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        alert('Could not inspect profile: ' + err);
+      }
+    }
+
+    async function reviewDecision(profileId, decision) {
+      try {
+        playEarcon('turn');
+        await fetch(`/api/v1/profiles/${profileId}/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            reviewer_name: 'Dr. Reviewer',
+            decision: decision,
+            clinical_notes: 'Reviewed via Nayanee Optometrist Dashboard.'
+          })
+        });
+        alert('Review updated successfully.');
+        inspectProfile(profileId);
+        loadProfiles();
+      } catch (err) {
+        alert('Review error: ' + err);
+      }
+    }
+  </script>
+</body>
+</html>
