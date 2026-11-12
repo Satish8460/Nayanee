@@ -31,13 +31,15 @@
 
 ---
 
-### [0:55 – 1:25] Zero-GPU SLU & Information Pruning (POC-01 & POC-03)
+### [0:55 – 1:25] Live Voice Recording & Zero-GPU SLU (POC-01 & POC-03)
 - **Visual:** Progressing through turns.
 - **Screen Action:** 
-  - On the screen time question, tap the spoken chip or type in the box: *"zero to one hour"* or click option.
+  - On the screen time question, tap the **🎤** microphone button.
+  - Notice the button switches to **⏹️ Recording...** and real live audio waves animate as you speak: *"ಒಂದು ಗಂಟೆಗಿಂತ ಕಡಿಮೆ"* (or *"less than one hour"*).
+  - Tap **⏹️** to send. The audio is transcribed and the zero-GPU intent matcher immediately selects the option.
   - Show how questions about progressive lens adaptation or previous spectacles are automatically pruned because Parvathamma never wore glasses.
 - **Voiceover:**
-  > *"Unlike rigid questionnaires, Nayanee's Information-Entropy engine calculates the most informative question next, automatically skipping irrelevant queries and pruning consultation time by over 25%. Even free-form spoken voice is analyzed locally with our zero-GPU Clinical SLU engine, matching intent with 95% confidence without calling cloud APIs."*
+  > *"Unlike rigid questionnaires, Nayanee's Information-Entropy engine calculates the most informative question next, automatically skipping irrelevant queries and pruning consultation time by over 25%. Our direct microphone audio pipeline records 16kHz PCM audio and analyzes it with our zero-GPU Clinical SLU engine, matching intent with 95% confidence without expensive cloud hardware."*
 
 ---
 
@@ -56,4 +58,4 @@
 - **Visual:** Click `🖨️ Print Consultation Slip`. A clean, printable consultation slip opens in a new tab.
 - **Screen Action:** Scroll down to show the patient demographics, reported functional demands, acute triage clearance, and optometrist sign-off block.
 - **Voiceover:**
-  > *"With one tap, store staff can print an official consultation slip for subjective refraction. Nayanee requires zero specialized hardware, runs entirely on CPU, passes 38 automated tests, and turns any ordinary smartphone into an accessible vision intelligence terminal. Thank you."*
+  > *"With one tap, store staff can print an official consultation slip for subjective refraction. Nayanee requires zero specialized hardware, runs entirely on CPU, passes 39 automated tests, and turns any ordinary smartphone into an accessible vision intelligence terminal. Thank you."*
