@@ -213,3 +213,21 @@ def test_session_with_patient_demographics():
     assert slip_resp.status_code == 200
     assert "Savitri Amma" in slip_resp.text
     assert "58" in slip_resp.text
+
+
+def test_transcribe_endpoint_validation():
+    # Invalid base64 returns 400
+    bad_resp = client.post(
+        "/api/v1/session/transcribe",
+        json={"audio_base64": "!!!not-base64!!!", "language": "kn"},
+    )
+    assert bad_resp.status_code == 400
+
+    # Short/empty payload returns graceful no_speech status
+    short_b64 = base64.b64encode(b"1234").decode("utf-8")
+    short_resp = client.post(
+        "/api/v1/session/transcribe",
+        json={"audio_base64": short_b64, "language": "kn"},
+    )
+    assert short_resp.status_code == 200
+    assert short_resp.json()["status"] == "no_speech"

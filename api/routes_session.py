@@ -35,6 +35,12 @@ try:
 except ImportError:
     HAS_GTTS = False
 
+try:
+    import speech_recognition as sr
+    HAS_SR = True
+except ImportError:
+    HAS_SR = False
+
 router = APIRouter(prefix="/api/v1/session", tags=["Session"])
 
 primary_asr = SimulatedIndicASRProvider()
@@ -358,3 +364,46 @@ def get_session_status(session_id: str):
         "contradictions_count": len(engine.contradictions),
         "red_flags_count": len(engine.red_flags),
     }
+
+
+class TranscribeAudioRequest(BaseModel):
+    audio_base64: str
+    language: str = "en"
+
+
+@router.post("/transcribe")
+def transcribe_recorded_audio(req: TranscribeAudioRequest):
+    """Transcribes real browser-recorded 16kHz PCM WAV audio in native Indic languages."""
+    if not HAS_SR:
+        return {"transcript": "", "status": "unavailable", "detail": "SpeechRecognition package not installed"}
+
+    try:
+        wav_bytes = base64.b64decode(req.audio_base64)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 audio payload.")
+
+    if len(wav_bytes) < 44:
+        return {"transcript": "", "status": "no_speech", "detail": "Recording too short"}
+
+    lang_map = {
+        "kn": "kn-IN",
+        "hi": "hi-IN",
+        "ta": "ta-IN",
+        "te": "te-IN",
+        "ml": "ml-IN",
+        "en": "en-IN",
+    }
+    google_lang = lang_map.get(req.language, "en-IN")
+
+    recognizer = sr.Recognizer()
+    try:
+        with sr.AudioFile(io.BytesIO(wav_bytes)) as source:
+            audio_data = recognizer.record(source)
+        transcript = recognizer.recognize_google(audio_data, language=google_lang)
+        return {"transcript": transcript, "status": "ok", "language": google_lang}
+    except sr.UnknownValueError:
+        return {"transcript": "", "status": "no_speech", "detail": "Could not detect clear speech"}
+    except sr.RequestError as exc:
+        return {"transcript": "", "status": "network_error", "detail": str(exc)}
+    except Exception as exc:
+        return {"transcript": "", "status": "error", "detail": str(exc)}

@@ -931,39 +931,207 @@
       }
     }
 
+    let micStream = null;
+    let micAudioCtx = null;
+    let micProcessor = null;
+    let micSource = null;
+    let micAnalyser = null;
+    let recordedChunks = [];
+    let recordingTimeout = null;
+
     async function toggleSpeech() {
-      if (!recognition) {
+      if (isRecording) {
+        await stopAndTranscribeRecording();
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         highlightOptionsPrompt();
         return;
       }
-      if (isRecording) {
-        try { recognition.stop(); } catch (e) {}
-        stopRecordingUI();
-      } else {
-        speechRetryCount = 0;
-        const langMap = { kn: 'kn-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN', ml: 'ml-IN', en: 'en-IN' };
-        recognition.lang = langMap[currentLanguage] || 'en-IN';
-        try {
-          playEarcon('speak');
-          recognition.start();
-          isRecording = true;
-          document.getElementById('micBtn').classList.add('recording');
-          document.getElementById('voiceStatusText').innerText = UI_I18N.listeningStatus[currentLanguage] || UI_I18N.listeningStatus.en;
-          document.getElementById('waveCanvas').style.display = 'block';
-          startWaveAnim();
-        } catch (e) {
-          console.warn('Speech recognition start failed:', e);
-          stopRecordingUI();
-          if (e.name === 'InvalidStateError') {
-            try { recognition.stop(); } catch (_) {}
-          }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (err) {
+        console.warn('Microphone access denied or unavailable:', err);
+        const statusEl = document.getElementById('voiceStatusText');
+        if (statusEl) {
+          statusEl.innerHTML = '<span style="color: #de350b; font-weight: 600;">⚠️ Mic permission blocked. Click the lock/mic icon in the browser address bar to allow.</span>';
         }
+        highlightOptionsPrompt();
+        return;
+      }
+
+      try {
+        playEarcon('speak');
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        micAudioCtx = new AudioCtx();
+        if (micAudioCtx.state === 'suspended') {
+          await micAudioCtx.resume();
+        }
+
+        micSource = micAudioCtx.createMediaStreamSource(micStream);
+        micAnalyser = micAudioCtx.createAnalyser();
+        micAnalyser.fftSize = 256;
+        micProcessor = micAudioCtx.createScriptProcessor(4096, 1, 1);
+
+        recordedChunks = [];
+        micProcessor.onaudioprocess = (e) => {
+          if (!isRecording) return;
+          const input = e.inputBuffer.getChannelData(0);
+          recordedChunks.push(new Float32Array(input));
+        };
+
+        micSource.connect(micAnalyser);
+        micAnalyser.connect(micProcessor);
+        micProcessor.connect(micAudioCtx.destination);
+
+        isRecording = true;
+        const micBtn = document.getElementById('micBtn');
+        micBtn.classList.add('recording');
+        micBtn.innerText = '⏹️';
+        document.getElementById('voiceStatusText').innerHTML = '<span style="color: #de350b; font-weight: 600;">🎙️ Recording... Speak clearly, then tap ⏹️ to send</span>';
+        document.getElementById('waveCanvas').style.display = 'block';
+        startWaveAnim();
+
+        // Safety auto-stop after 15 seconds
+        recordingTimeout = setTimeout(() => {
+          if (isRecording) stopAndTranscribeRecording();
+        }, 15000);
+      } catch (e) {
+        console.warn('Audio recording initialization failed:', e);
+        cleanupRecorderNodes();
+        stopRecordingUI();
+      }
+    }
+
+    function cleanupRecorderNodes() {
+      if (recordingTimeout) {
+        clearTimeout(recordingTimeout);
+        recordingTimeout = null;
+      }
+      try { if (micProcessor) micProcessor.disconnect(); } catch (_) {}
+      try { if (micAnalyser) micAnalyser.disconnect(); } catch (_) {}
+      try { if (micSource) micSource.disconnect(); } catch (_) {}
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+      if (micAudioCtx) {
+        const ctxToClose = micAudioCtx;
+        micAudioCtx = null;
+        try { ctxToClose.close(); } catch (_) {}
+      }
+      micProcessor = null;
+      micAnalyser = null;
+      micSource = null;
+    }
+
+    function encodeWav16k(chunks, inputSampleRate) {
+      let totalLen = 0;
+      for (const c of chunks) totalLen += c.length;
+      const merged = new Float32Array(totalLen);
+      let offset = 0;
+      for (const c of chunks) {
+        merged.set(c, offset);
+        offset += c.length;
+      }
+
+      const targetRate = 16000;
+      const ratio = inputSampleRate / targetRate;
+      const outLen = Math.max(1, Math.floor(merged.length / ratio));
+      const resampled = new Float32Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const idx = Math.min(merged.length - 1, Math.floor(i * ratio));
+        resampled[i] = merged[idx];
+      }
+
+      const buffer = new ArrayBuffer(44 + outLen * 2);
+      const view = new DataView(buffer);
+      const writeStr = (off, str) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i));
+      };
+
+      writeStr(0, 'RIFF');
+      view.setUint32(4, 36 + outLen * 2, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, targetRate, true);
+      view.setUint32(28, targetRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, 'data');
+      view.setUint32(40, outLen * 2, true);
+
+      let pos = 44;
+      for (let i = 0; i < outLen; i++) {
+        const s = Math.max(-1, Math.min(1, resampled[i]));
+        view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        pos += 2;
+      }
+
+      const bytes = new Uint8Array(buffer);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i += 0x8000) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      }
+      return btoa(bin);
+    }
+
+    async function stopAndTranscribeRecording() {
+      isRecording = false;
+      const sampleRate = micAudioCtx ? micAudioCtx.sampleRate : 48000;
+      const chunksCopy = recordedChunks.slice();
+      recordedChunks = [];
+      cleanupRecorderNodes();
+
+      const micBtn = document.getElementById('micBtn');
+      micBtn.classList.remove('recording');
+      micBtn.innerText = '🎤';
+      document.getElementById('waveCanvas').style.display = 'none';
+
+      const statusEl = document.getElementById('voiceStatusText');
+      if (chunksCopy.length === 0) {
+        if (statusEl) statusEl.innerText = UI_I18N.micPrompt[currentLanguage] || UI_I18N.micPrompt.en;
+        return;
+      }
+
+      if (statusEl) statusEl.innerHTML = '<span style="color: #0052cc; font-weight: 600;">⏳ Transcribing your voice...</span>';
+
+      try {
+        const wavBase64 = encodeWav16k(chunksCopy, sampleRate);
+        const resp = await fetch('/api/v1/session/transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ audio_base64: wavBase64, language: currentLanguage })
+        });
+        const data = await resp.json();
+        if (data.status === 'ok' && data.transcript && data.transcript.trim()) {
+          await handleSpeechTranscript(data.transcript.trim());
+        } else if (data.status === 'no_speech') {
+          if (statusEl) statusEl.innerHTML = '<span style="color: #ff991f; font-weight: 600;">⚠️ No clear speech heard. Tap 🎤 to try again or tap an option below.</span>';
+          highlightOptionsPrompt();
+        } else {
+          if (statusEl) statusEl.innerHTML = '<span style="color: #0052cc; font-weight: 600;">🎙️ Offline Voice Mode: Tap your spoken response below or type:</span>';
+          highlightOptionsPrompt();
+        }
+      } catch (err) {
+        console.warn('Transcription request failed:', err);
+        if (statusEl) statusEl.innerHTML = '<span style="color: #0052cc; font-weight: 600;">🎙️ Voice ready: Tap a quick option below or type:</span>';
+        highlightOptionsPrompt();
       }
     }
 
     function stopRecordingUI() {
       isRecording = false;
-      document.getElementById('micBtn').classList.remove('recording');
+      const micBtn = document.getElementById('micBtn');
+      if (micBtn) {
+        micBtn.classList.remove('recording');
+        micBtn.innerText = '🎤';
+      }
       document.getElementById('voiceStatusText').innerText = UI_I18N.micPrompt[currentLanguage] || UI_I18N.micPrompt.en;
       document.getElementById('waveCanvas').style.display = 'none';
     }
@@ -1086,25 +1254,39 @@
       }
     }
 
-    // Audio Visualizer Animation
+    // Audio Visualizer Animation (Live Microphone Amplitude)
     let wavePhase = 0;
     function startWaveAnim() {
       const canvas = document.getElementById('waveCanvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
+      const dataArray = micAnalyser ? new Uint8Array(micAnalyser.frequencyBinCount) : null;
       function draw() {
         if (!isRecording) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
         ctx.strokeStyle = '#de350b';
         ctx.lineWidth = 2.5;
-        for (let x = 0; x < canvas.width; x++) {
-          const y = canvas.height / 2 + Math.sin(x * 0.15 + wavePhase) * 10;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+        if (micAnalyser && dataArray) {
+          micAnalyser.getByteTimeDomainData(dataArray);
+          const sliceWidth = canvas.width / dataArray.length;
+          let x = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = (v * canvas.height) / 2;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            x += sliceWidth;
+          }
+        } else {
+          for (let x = 0; x < canvas.width; x++) {
+            const y = canvas.height / 2 + Math.sin(x * 0.15 + wavePhase) * 10;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          wavePhase += 0.2;
         }
         ctx.stroke();
-        wavePhase += 0.2;
         requestAnimationFrame(draw);
       }
       requestAnimationFrame(draw);
