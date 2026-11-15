@@ -5,7 +5,7 @@ import uuid
 import json
 import base64
 from typing import Optional, Dict, Any, List
-from fastapi import APIRouter, HTTPException, status, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, status, WebSocket, WebSocketDisconnect, Query
 from pydantic import BaseModel, Field
 
 from pocs.poc01_adaptive_engine.models import (
@@ -51,10 +51,10 @@ speech_pipeline = MultilingualSpeechPipeline(primary_asr, secondary_asr, tts_pro
 
 class StartSessionRequest(BaseModel):
     language: LanguageCode = LanguageCode.ENGLISH
-    patient_name: Optional[str] = "Anonymous Patient"
-    patient_age: Optional[int] = None
-    patient_gender: Optional[str] = None
-    patient_phone: Optional[str] = None
+    patient_name: Optional[str] = Field(default="Anonymous Patient", max_length=100)
+    patient_age: Optional[int] = Field(default=None, ge=1, le=125)
+    patient_gender: Optional[str] = Field(default=None, max_length=30)
+    patient_phone: Optional[str] = Field(default=None, max_length=25)
     demographics: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 
@@ -137,7 +137,7 @@ def format_question_payload(q: Question, lang: LanguageCode) -> QuestionPayload:
 
 
 @router.get("/speak")
-def stream_speech_audio(text: str, lang: str = "en"):
+def stream_speech_audio(text: str = Query(default="", max_length=2000), lang: str = "en"):
     """Streams real native-voice MP3 audio across Kannada, Hindi, Tamil, Telugu, Malayalam, and English."""
     if HAS_GTTS and text.strip():
         try:
@@ -431,9 +431,19 @@ def submit_onscreen_test(session_id: str, test_type: str, req: SubmitScreeningRe
         raise HTTPException(status_code=404, detail="Session not found.")
 
     from pocs.poc07_zeiss_matcher_and_screening.onscreen_screening import OnScreenScreeningEngine
-    valid_tests = ["duochrome", "astigmatic_dial", "amsler_grid"]
-    if test_type not in valid_tests:
-        raise HTTPException(status_code=400, detail=f"Invalid test type. Must be one of {valid_tests}")
+    valid_test_selections = {
+        "duochrome": ["red_clearer", "green_clearer", "equally_sharp"],
+        "astigmatic_dial": ["all_lines_equal", "12_to_6", "9_to_3", "10_to_4", "2_to_8"],
+        "amsler_grid": ["all_lines_straight", "wavy_distorted_lines", "dark_patch_missing_spots"],
+    }
+    if test_type not in valid_test_selections:
+        raise HTTPException(status_code=400, detail=f"Invalid test type. Must be one of {list(valid_test_selections.keys())}")
+
+    if req.selection not in valid_test_selections[test_type]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid selection '{req.selection}' for test '{test_type}'. Allowed: {valid_test_selections[test_type]}"
+        )
 
     if test_type == "duochrome":
         res = OnScreenScreeningEngine.evaluate_duochrome(req.selection)

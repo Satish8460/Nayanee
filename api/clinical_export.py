@@ -1,6 +1,7 @@
 """Clinical Export Service for Nayanee.
 """
 
+import html
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import HTMLResponse
 from pocs.poc01_adaptive_engine.explainability import ExplainabilityReport
@@ -182,6 +183,9 @@ def export_printable_slip(profile_id: str):
     status_color = "#de350b" if is_urgent else "#0052cc"
     status_label = "URGENT MEDICAL TRIAGE" if is_urgent else prof.review_status.value.replace("_", " ").upper()
 
+    safe_p_name = html.escape(str(getattr(prof, 'patient_name', 'Anonymous Patient') or 'Anonymous Patient'))
+    safe_p_gender = html.escape(str(getattr(prof, 'patient_gender', 'N/A') or 'N/A'))
+
     html_content = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -248,8 +252,8 @@ def export_printable_slip(profile_id: str):
   <div class="section">
     <div class="section-title">Patient Intake Details</div>
     <div class="grid">
-      <div class="box"><strong>Patient Name:</strong> {getattr(prof, 'patient_name', 'Anonymous Patient')}</div>
-      <div class="box"><strong>Age / Gender:</strong> {getattr(prof, 'patient_age', 'N/A') or 'N/A'} yrs / {getattr(prof, 'patient_gender', 'N/A') or 'N/A'}</div>
+      <div class="box"><strong>Patient Name:</strong> {safe_p_name}</div>
+      <div class="box"><strong>Age / Gender:</strong> {getattr(prof, 'patient_age', 'N/A') or 'N/A'} yrs / {safe_p_gender}</div>
       <div class="box"><strong>Interaction Language:</strong> {prof.customer_language.value.upper()}</div>
       <div class="box"><strong>Consultation Date:</strong> {prof.created_at[:10]}</div>
     </div>
