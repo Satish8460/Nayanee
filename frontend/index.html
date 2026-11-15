@@ -503,10 +503,16 @@
             <h3 style="color: #002b66; margin: 0;" id="screeningTitle">🔬 On-Screen Visual Functional Check</h3>
             <span style="font-size: 0.85rem; color: #5e6c84;" id="screeningStepIndicator">Test 1 of 3: Red-Green Duochrome Balance</span>
           </div>
-          <button onclick="skipScreening()" style="padding: 6px 14px; background: #ebecf0; border: 1px solid #c1c7d0; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: 600;">
-            Done / Skip &rarr;
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button id="screeningAudioBtn" class="q-audio-btn" style="margin: 0; padding: 6px 14px; font-size: 0.85rem; background: #0052cc; color: white; display: inline-flex; align-items: center; gap: 6px;" onclick="playScreeningAudio()">
+              🔊 Listen Instructions
+            </button>
+            <button id="screeningSkipBtn" onclick="skipScreening()" style="padding: 6px 14px; background: #ebecf0; border: 1px solid #c1c7d0; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: 600;">
+              Done / Skip &rarr;
+            </button>
+          </div>
         </div>
+        <div id="screeningAudioStatus" style="font-size: 0.8rem; color: #0052cc; margin-bottom: 8px; text-align: center; display: none;"></div>
         <div id="screeningContent" style="text-align: center; padding: 12px 0;"></div>
       </div>
     </section>
@@ -943,6 +949,7 @@
             activeProfileId = data.profile_id;
             displayCustomerZeissMatch(data.profile_id);
           }
+          updateSummaryButtonsI18n();
           document.getElementById('interviewCard').style.display = 'none';
           document.getElementById('summaryCard').style.display = 'block';
         } else if (data.current_question) {
@@ -1206,18 +1213,23 @@
     // Real Native Voice Streamer with Multi-Tier Fallback
     let currentAudioObj = null;
 
-    function speakText(text) {
-      const btn = document.getElementById('listenBtn');
-      const indicator = document.getElementById('audioStatusIndicator');
+    function speakText(text, btnId = 'listenBtn', indicatorId = 'audioStatusIndicator') {
+      const btn = document.getElementById(btnId);
+      const indicator = document.getElementById(indicatorId);
 
       if (btn) btn.classList.add('playing');
       if (indicator) {
         indicator.style.display = 'block';
-        indicator.innerText = '🔊 Loading native voice...';
+        indicator.innerText = (currentLanguage === 'kn' ? '🔊 ಧ್ವನಿಯನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...' :
+                               currentLanguage === 'hi' ? '🔊 आवाज लोड हो रही है...' :
+                               currentLanguage === 'ta' ? '🔊 குரல் ஏற்றப்படுகிறது...' :
+                               currentLanguage === 'te' ? '🔊 వాయిస్ లోడ్ అవుతోంది...' :
+                               currentLanguage === 'ml' ? '🔊 ശബ്ദം ലോഡുചെയ്യുന്നു...' :
+                               '🔊 Loading native voice...');
       }
 
       if (currentAudioObj) {
-        currentAudioObj.pause();
+        try { currentAudioObj.pause(); } catch(e) {}
         currentAudioObj = null;
       }
 
@@ -1226,7 +1238,14 @@
       currentAudioObj = audio;
 
       audio.onplay = () => {
-        if (indicator) indicator.innerText = '🔊 Speaking in native voice...';
+        if (indicator) {
+          indicator.innerText = (currentLanguage === 'kn' ? '🔊 ಸ್ಥಳೀಯ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡುತ್ತಿದೆ...' :
+                                 currentLanguage === 'hi' ? '🔊 आवाज में बोल रहा है...' :
+                                 currentLanguage === 'ta' ? '🔊 குரலில் பேசுகிறது...' :
+                                 currentLanguage === 'te' ? '🔊 వాయిస్ లో మాట్లాడుతోంది...' :
+                                 currentLanguage === 'ml' ? '🔊 ശബ്ദത്തിൽ സംസാരിക്കുന്നു...' :
+                                 '🔊 Speaking in native voice...');
+        }
         document.getElementById('waveCanvas').style.display = 'block';
         startWaveAnim();
       };
@@ -1541,9 +1560,370 @@
       }
     }
 
+    // -------------------------------------------------------------------------
+    // Multilingual Localization Dictionaries for Screening & ZEISS Recommendation
+    // -------------------------------------------------------------------------
+    const SCREENING_I18N = {
+      kn: {
+        startBtn: "🔬 45 ಸೆಕೆಂಡುಗಳ ಪರದೆಯ ದೃಷ್ಟಿ ತಪಾಸಣೆ (ಐಚ್ಛಿಕ)",
+        retakeBtn: "✓ ದೃಷ್ಟಿ ತಪಾಸಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ (ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ)",
+        listenBtn: "🔊 ಧ್ವನಿ ಸೂಚನೆ ಆಲಿಸಿ",
+        skipBtn: "ವರದಿಗೆ ತೆರಳಿ / ಬಿಟ್ಟುಬಿಡಿ ⏭️",
+        emergencyAlert: "⚠️ ಕ್ಲಿನಿಕಲ್ ಸುರಕ್ಷತಾ ಎಚ್ಚರಿಕೆ: ಈ ಪರೀಕ್ಷೆಯು ರೆಟಿನಾ/ಮ್ಯಾಕ್ಯುಲಾ ದೋಷದ ಲಕ್ಷಣವನ್ನು ಸೂಚಿಸಿದೆ. ತಕ್ಷಣವೇ ನೇತ್ರ ತಜ್ಞರ ತಪಾಸಣೆ ಅಗತ್ಯ.",
+        duochrome: {
+          title: "🔬 ಪರೀಕ್ಷೆ 1/3: ಕೆಂಪು-ಹಸಿರು ಡ್ಯುಯೋಕ್ರೋಮ್ ಬ್ಯಾಲೆನ್ಸ್",
+          subtitle: "ಕಣ್ಣಿನ ಕೇಂದ್ರ ಕೇಂದ್ರೀಕರಣ (ಮಯೋಪಿಯಾ / ಹೈಪರೋಪಿಯಾ ಪ್ರವೃತ್ತಿ) ಪರಿಶೀಲನೆ",
+          prompt: "ಎರಡೂ ಬಣ್ಣಗಳಲ್ಲಿರುವ 'E' ಅಕ್ಷರಗಳನ್ನು ಗಮನಿಸಿ. ಯಾವ 'E' ಅಕ್ಷರ ಹೆಚ್ಚು ಗಾಢವಾಗಿ, ಸ್ಪಷ್ಟವಾಗಿ ಕಾಣುತ್ತಿದೆ?",
+          audio: "ದಯವಿಟ್ಟು ಪರದೆಯ ಮೇಲಿರುವ ಕೆಂಪು ಮತ್ತು ಹಸಿರು ಬಣ್ಣಗಳ ಕಡೆಗೆ ನೋಡಿ. ಎರಡೂ ಬದಿಗಳಲ್ಲಿ ಇ ಅಕ್ಷರವಿದೆ. ನಿಮ್ಮ ದೃಷ್ಟಿಗೆ ಯಾವ ಅಕ್ಷರ ಹೆಚ್ಚು ಗಾಢವಾಗಿ ಮತ್ತು ಸ್ಪಷ್ಟವಾಗಿ ಕಾಣಿಸುತ್ತಿದೆ? ಕೆಂಪು ಸ್ಪಷ್ಟವಾಗಿದ್ದರೆ ಕೆಂಪು ಗುಂಡಿ ಒತ್ತಿ, ಹಸಿರು ಸ್ಪಷ್ಟವಾಗಿದ್ದರೆ ಹಸಿರು ಗುಂಡಿ ಒತ್ತಿ, ಎರಡೂ ಸಮಾನವಾಗಿದ್ದರೆ ಸಮಾನ ಗುಂಡಿ ಒತ್ತಿ.",
+          options: {
+            red_clearer: "🔴 ಕೆಂಪು ಭಾಗ ಹೆಚ್ಚು ಸ್ಪಷ್ಟ",
+            green_clearer: "🟢 ಹಸಿರು ಭಾಗ ಹೆಚ್ಚು ಸ್ಪಷ್ಟ",
+            equally_sharp: "⚖️ ಎರಡೂ ಸಮಾನವಾಗಿ ಸ್ಪಷ್ಟ"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 ಪರೀಕ್ಷೆ 2/3: ಅಸ್ಟಿಗ್ಮ್ಯಾಟಿಕ್ ಗಡಿಯಾರ ಡಯಲ್",
+          subtitle: "ಸಿಲಿಂಡರ್ ದೋಷ ಮತ್ತು ಅಸ್ಪಷ್ಟತೆಯ ಕೋನವನ್ನು ಪತ್ತೆ ಮಾಡುತ್ತದೆ",
+          prompt: "ಎಲ್ಲಾ ಕಪ್ಪು ಗೆರೆಗಳು ಸಮಾನವಾಗಿ ಸ್ಪಷ್ಟವಾಗಿವೆಯಾ, ಅಥವಾ ಯಾವುದಾದರೂ ನಿರ್ದಿಷ್ಟ ದಿಕ್ಕಿನ ಗೆರೆಗಳು ಹೆಚ್ಚು ಗಾಢವಾಗಿ ಅಥವಾ ದಪ್ಪವಾಗಿ ಕಾಣಿಸುತ್ತಿವೆಯಾ?",
+          audio: "ಈ ಗಡಿಯಾರದ ಡಯಲ್ ಮೇಲೆ ಇರುವ ಕಪ್ಪು ಗೆರೆಗಳನ್ನು ಗಮನಿಸಿ. ಎಲ್ಲಾ ಗೆರೆಗಳು ಒಂದೇ ರೀತಿ ಸಮಾನವಾಗಿ ಕಾಣಿಸುತ್ತಿವೆಯಾ? ಅಥವಾ ಕೇವಲ ಲಂಬ ಗೆರೆ, ಅಥವಾ ಅಡ್ಡ ಗೆರೆ, ಅಥವಾ ಓರೆ ಗೆರೆ ಹೆಚ್ಚು ಗಾಢವಾಗಿ ಅಥವಾ ದಪ್ಪವಾಗಿ ಕಾಣಿಸುತ್ತಿದೆಯಾ? ನಿಮ್ಮ ಆಯ್ಕೆಯನ್ನು ಕೆಳಗೆ ಮುಟ್ಟಿ.",
+          options: {
+            all_lines_equal: "⚪ ಎಲ್ಲಾ ಗೆರೆಗಳು ಸಮಾನವಾಗಿವೆ",
+            "12_to_6": "↕️ ಲಂಬ (12-6) ಗೆರೆ ಗಾಢ",
+            "9_to_3": "↔️ ಅಡ್ಡ (9-3) ಗೆರೆ ಗಾಢ",
+            "10_to_4": "↗️ ಓರೆ ಗೆರೆಗಳು ಗಾಢ"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 ಪರೀಕ್ಷೆ 3/3: ಆಮ್ಸ್ಲರ್ ಗ್ರಿಡ್ ರೆಟಿನಾ ತಪಾಸಣೆ",
+          subtitle: "ಕಣ್ಣಿನ ಕೇಂದ್ರ ರೆಟಿನಾ (ಮ್ಯಾಕ್ಯುಲಾ) ಮತ್ತು ದೃಷ್ಟಿ ದೋಷಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ",
+          prompt: "ಒಂದು ಕಣ್ಣನ್ನು ಮುಚ್ಚಿ ಮಧ್ಯದ ಕಪ್ಪು ಚುಕ್ಕೆಯನ್ನು ಮಾತ್ರ ನೋಡಿ. ಚೌಕಟ್ಟಿನ ಎಲ್ಲಾ ಗೆರೆಗಳು ನೇರವಾಗಿವೆಯಾ, ಅಥವಾ ಅಲೆಯಂತೆ ವಕ್ರವಾಗಿ ಅಥವಾ ಕಪ್ಪು ಮಚ್ಚೆ ಕಾಣಿಸುತ್ತಿದೆಯಾ?",
+          audio: "ದಯವಿಟ್ಟು ನಿಮ್ಮ ಒಂದು ಕಣ್ಣನ್ನು ಮುಚ್ಚಿ, ಪರದೆಯ ಮಧ್ಯದಲ್ಲಿರುವ ಕಪ್ಪು ಚುಕ್ಕೆಯ ಕಡೆಗೆ ಮಾತ್ರ ನೇರವಾಗಿ ನೋಡಿ. ಸುತ್ತಲಿನ ಚೌಕದ ಗೆರೆಗಳು ಸಂಪೂರ್ಣ ನೇರವಾಗಿವೆಯಾ? ಅಥವಾ ಗೆರೆಗಳು ಅಲೆಯಂತೆ ಬಾಗಿವೆಯಾ, ಅಥವಾ ನಡುವೆ ಕಪ್ಪು ಮಚ್ಚೆ ಅಥವಾ ಗೆರೆಗಳು ಕಾಣೆಯಾಗಿವೆಯಾ? ನಿಮ್ಮ ಆಯ್ಕೆಯನ್ನು ಒತ್ತಿ.",
+          options: {
+            all_lines_straight: "✅ ಎಲ್ಲಾ ಗೆರೆಗಳು ನೇರ & ಸ್ಪಷ್ಟ",
+            wavy_distorted_lines: "⚠️ ಗೆರೆಗಳು ಅಲೆಯಂತೆ ಬಾಗಿವೆ",
+            dark_patch_missing_spots: "🚨 ಕಪ್ಪು ಮಚ್ಚೆ / ಗೆರೆಗಳು ಕಾಣೆಯಾಗಿವೆ"
+          }
+        }
+      },
+      hi: {
+        startBtn: "🔬 45 सेकंड की ऑन-स्क्रीन दृष्टि जांच (वैकल्पिक)",
+        retakeBtn: "✓ दृष्टि जांच पूर्ण हुई (पुनः जांचें)",
+        listenBtn: "🔊 आवाज में निर्देश सुनें",
+        skipBtn: "छोड़ें और रिपोर्ट देखें ⏭️",
+        emergencyAlert: "⚠️ क्लिनिकल सुरक्षा चेतावनी: स्क्रीन परीक्षण में रेटिना/मैक्युला संबंधी गंभीर लक्षण दिखे हैं। तुरंत नेत्र रोग विशेषज्ञ से जांच कराएं।",
+        duochrome: {
+          title: "🔬 परीक्षण 1/3: लाल-हरा डुओक्रोम संतुलन",
+          subtitle: "गोलाकार फोकस संतुलन (निकट / दूर दृष्टि प्रवृत्ति) की जांच",
+          prompt: "दोनों रंगों में बने 'E' अक्षर को देखें। कौन सा 'E' ज्यादा गहरा, साफ या स्पष्ट दिखाई दे रहा है?",
+          audio: "कृपया स्क्रीन पर लाल और हरे रंग की तरफ देखें। दोनों तरफ ई अक्षर बना है। आपकी नजर में कौन सा अक्षर ज्यादा गहरा और साफ दिखाई दे रहा है? लाल साफ दिखे तो लाल बटन दबाएं, हरा दिखे तो हरा, या दोनों बराबर लगें तो बराबर बटन दबाएं।",
+          options: {
+            red_clearer: "🔴 लाल भाग ज्यादा स्पष्ट है",
+            green_clearer: "🟢 हरा भाग ज्यादा स्पष्ट है",
+            equally_sharp: "⚖️ दोनों बराबर स्पष्ट हैं"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 परीक्षण 2/3: एस्टिग्मेटिक क्लॉक डायल",
+          subtitle: "सिलेंडर दृष्टि दोष और धुंधलेपन के अक्ष की पहचान",
+          prompt: "क्या सभी काली रेखाएं एक जैसी साफ दिख रही हैं, या किसी खास दिशा की रेखा ज्यादा गहरी या मोटी नजर आ रही है?",
+          audio: "इस घड़ी के डायल पर काली रेखाओं को ध्यान से देखें। क्या सभी रेखाएं एक समान दिख रही हैं? या फिर सीधी खड़ी रेखा, आड़ी रेखा या तिरछी रेखा ज्यादा मोटी या गहरी लग रही है? अपना विकल्प नीचे चुनें।",
+          options: {
+            all_lines_equal: "⚪ सभी रेखाएं एक समान हैं",
+            "12_to_6": "↕️ लंबवत (12-6) ज्यादा गहरी",
+            "9_to_3": "↔️ क्षैतिज (9-3) ज्यादा गहरी",
+            "10_to_4": "↗️ तिरछी रेखाएं ज्यादा गहरी"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 परीक्षण 3/3: एम्सलर ग्रिड मैकुलर (रेटिना) स्क्रीनिंग",
+          subtitle: "रेटिना के केंद्रीय 10° क्षेत्र में विकृति या अंध बिंदुओं की जांच",
+          prompt: "एक आंख बंद करके बीच के काले बिंदु को देखें। क्या सभी लाइनें सीधी और चौकोर हैं, या कोई लाइन मुड़ी हुई, लहरदार या गायब दिख रही है?",
+          audio: "कृपया अपनी एक आंख बंद करें और ग्रिड के केंद्र में स्थित काले बिंदु को ध्यान से देखें। क्या सभी चौकोर रेखाएं बिल्कुल सीधी दिख रही हैं? या फिर रेखाएं लहरदार हैं, या कहीं कोई काला धब्बा या गायब हिस्सा दिख रहा है? कृपया नीचे चुनें।",
+          options: {
+            all_lines_straight: "✅ सभी रेखाएं सीधी और स्पष्ट हैं",
+            wavy_distorted_lines: "⚠️ रेखाएं लहरदार या मुड़ी हुई हैं",
+            dark_patch_missing_spots: "🚨 काला धब्बा / रेखाएं गायब हैं"
+          }
+        }
+      },
+      ta: {
+        startBtn: "🔬 45 வினாடி திரை பார்வை பரிசோதனை (விருப்பத்தேர்வு)",
+        retakeBtn: "✓ பார்வை சோதனை முடிந்தது (மீண்டும் எடுக்கவும்)",
+        listenBtn: "🔊 குரல் வழிமுறைகளைக் கேளுங்கள்",
+        skipBtn: "தவிர்த்து அறிக்கைக்குச் செல்லவும் ⏭️",
+        emergencyAlert: "⚠️ மருத்துவ எச்சரிக்கை: இந்த சோதனையில் விழித்திரை/மேக்குலர் பிரச்சனை தெரியவந்துள்ளது. உடனடியாக கண் மருத்துவரை அணுகவும்.",
+        duochrome: {
+          title: "🔬 சோதனை 1/3: சிவப்பு-பச்சை டூயோக்ரோம் சமநிலை",
+          subtitle: "கோள குவிப்பு சமநிலையை சரிபார்க்கிறது",
+          prompt: "இரண்டு வண்ணங்களிலும் உள்ள 'E' எழுத்தைப் பாருங்கள். எந்த 'E' அதிக தெளிவு அல்லது அடர்த்தியாகத் தெரிகிறது?",
+          audio: "திரையில் உள்ள சிவப்பு மற்றும் பச்சை வண்ணங்களைப் பாருங்கள். இரண்டிலும் ஈ எழுத்து உள்ளது. உங்கள் பார்வைக்கு எந்த எழுத்து அதிக தெளிவாகத் தெரிகிறது? சிவப்பு என்றால் சிவப்பு பொத்தானையும், பச்சை என்றால் பச்சை பொத்தானையும், இரண்டும் சமம் என்றால் சமம் பொத்தானையும் அழுத்தவும்.",
+          options: {
+            red_clearer: "🔴 சிவப்பு பகுதி தெளிவானது",
+            green_clearer: "🟢 பச்சை பகுதி தெளிவானது",
+            equally_sharp: "⚖️ இரண்டும் சமமாக தெளிவானவை"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 சோதனை 2/3: அஸ்டிக்மாடிக் கடிகார டயல்",
+          subtitle: "சிலிண்டர் குறைபாடு மற்றும் மங்கலான கோணத்தைக் கண்டறியும்",
+          prompt: "அனைத்து கருப்புக் கோடுகளும் ஒரே மாதிரியாகத் தெரிகிறதா, அல்லது ஏதேனும் ஒரு குறிப்பிட்ட திசைக் கோடு தடிமனாக அல்லது அடர்த்தியாகத் தெரிகிறதா?",
+          audio: "இந்த கடிகார டயலில் உள்ள கருப்பு கோடுகளை கவனியுங்கள். அனைத்து கோடுகளும் சமமாகத் தெரிகிறதா? அல்லது செங்குத்து, கிடைமட்ட அல்லது சாய்வு கோடு ஏதேனும் தடிமனாகத் தெரிகிறதா? கீழே உள்ள பொத்தானை அழுத்தவும்.",
+          options: {
+            all_lines_equal: "⚪ அனைத்து கோடுகளும் சமம்",
+            "12_to_6": "↕️ செங்குத்து (12-6) அடர்த்தியானது",
+            "9_to_3": "↔️ கிடைமட்ட (9-3) அடர்த்தியானது",
+            "10_to_4": "↗️ சாய்வு கோடுகள் அடர்த்தியானவை"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 சோதனை 3/3: ஆம்ஸ்லர் கட்ட மேக்குலர் பரிசோதனை",
+          subtitle: "மத்திய ரெட்டினா குறைபாடுகள் மற்றும் குருட்டு புள்ளிகளை சரிபார்க்கிறது",
+          prompt: "ஒரு கண்ணை மூடிக்கொண்டு நடுவில் உள்ள கருப்பு புள்ளியை மட்டும் பார்க்கவும். கட்டக் கோடுகள் நேராக உள்ளதா, அல்லது வளைந்தோ அல்லது கரும்புள்ளியாகவோ உள்ளதா?",
+          audio: "தயவுசெய்து ஒரு கண்ணை மூடி, நடுவில் உள்ள கருப்பு புள்ளியை மட்டும் நேராகப் பாருங்கள். அனைத்து சதுரக் கோடுகளும் நேராக உள்ளதா? அல்லது அலை அலையாக வளைந்துள்ளதா, அல்லது ஏதேனும் பகுதியில் கருப்பு திட்டு உள்ளதா? தேர்வு செய்யவும்.",
+          options: {
+            all_lines_straight: "✅ அனைத்து கோடுகளும் நேராக உள்ளன",
+            wavy_distorted_lines: "⚠️ கோடுகள் வளைந்து அலைபோல் உள்ளன",
+            dark_patch_missing_spots: "🚨 கருப்பு திட்டு / கோடுகள் மறைந்துள்ளன"
+          }
+        }
+      },
+      te: {
+        startBtn: "🔬 45 సెకన్ల ఆన్-స్క్రీన్ దృష్టి తనిఖీ (ఐచ్ఛికం)",
+        retakeBtn: "✓ దృష్టి తనిఖీ పూర్తయింది (మళ్లీ తీసుకోండి)",
+        listenBtn: "🔊 వాయిస్ సూచనలు వినండి",
+        skipBtn: "స్కిప్ చేసి రిపోర్ట్ చూడండి ⏭️",
+        emergencyAlert: "⚠️ క్లినికల్ సేఫ్టీ హెచ్చరిక: ఈ పరీక్ష రెటీనా/మ్యాక్యులా లోపాన్ని సూచించింది. వెంటనే కంటి నిపుణుడిని సంప్రదించండి.",
+        duochrome: {
+          title: "🔬 పరీక్ష 1/3: ఎరుపు-ఆకుపచ్చ డుయోక్రోమ్ సంతులనం",
+          subtitle: "గోళాకార దృష్టి కేంద్రీకరణ సంతులనాన్ని తనిఖీ చేస్తుంది",
+          prompt: "రెండు రంగులలో ఉన్న 'E' అక్షరాన్ని చూడండి. ఏ 'E' మరింత స్పష్టంగా లేదా ముదురుగా కనిపిస్తోంది?",
+          audio: "దయచేసి స్క్రీన్ పై ఉన్న ఎరుపు మరియు ఆకుపచ్చ రంగులను చూడండి. రెండింటిలోనూ ఈ అక్షరం ఉంది. మీ దృష్టికి ఏ అక్షరం మరింత స్పష్టంగా కనిపిస్తోంది? ఎరుపు అయితే ఎరుపు బటన్, ఆకుపచ్చ అయితే ఆకుపచ్చ బటన్, లేదా రెండూ సమానం అయితే సమానం బటన్ నొక్కండి.",
+          options: {
+            red_clearer: "🔴 ఎరుపు భాగం మరింత స్పష్టం",
+            green_clearer: "🟢 ఆకుపచ్చ భాగం మరింత స్పష్టం",
+            equally_sharp: "⚖️ రెండూ సమానంగా స్పష్టం"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 పరీక్ష 2/3: అస్టిగ్మాటిక్ క్లాక్ డయల్",
+          subtitle: "సిలిండ్రికల్ దృష్టి లోపం మరియు కోణాన్ని గుర్తిస్తుంది",
+          prompt: "అన్ని నల్ల గీతలు సమానంగా కనిపిస్తున్నాయా, లేదా ఏదైనా దిశలోని గీతలు ముదురుగా లేదా లావుగా కనిపిస్తున్నాయా?",
+          audio: "ఈ గడియారం డయల్ పై ఉన్న నల్ల గీతలను గమనించండి. అన్ని గీతలు ఒకేలా ఉన్నాయా? లేక నిలువు గీత, అడ్డ గీత లేదా ఏటవాలు గీత ఎక్కువ ముదురుగా కనిపిస్తోందా? మీ ఎంపికను కింద తాకండి.",
+          options: {
+            all_lines_equal: "⚪ అన్ని గీతలు సమానంగా ఉన్నాయి",
+            "12_to_6": "↕️ నిలువు (12-6) గీత ముదురు",
+            "9_to_3": "↔️ అడ్డ (9-3) గీత ముదురు",
+            "10_to_4": "↗️ ఏటవాలు గీతలు ముదురు"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 పరీక్ష 3/3: ఆమ్స్లర్ గ్రిడ్ రెటీనా పరీక్ష",
+          subtitle: "కేంద్ర రెటీనా లోపాలు మరియు దృష్టి మచ్చలను తనిఖీ చేస్తుంది",
+          prompt: "ఒక కంటిని మూసి మధ్యలోని నల్ల చుక్కను చూడండి. గ్రిడ్ గీతలన్నీ నేరుగా ఉన్నాయా, లేదా అలలలా వంకరగా లేదా నల్ల మచ్చగా కనిపిస్తున్నాయా?",
+          audio: "దయచేసి ఒక కన్ను మూసి, మధ్యలోని నల్లటి చుక్కపై మాత్రమే దృష్టి పెట్టండి. అన్ని గీతలు చక్కగా నేరుగా ఉన్నాయా? లేదా వంకరటింకరగా అలలలాగా ఉన్నాయా, లేక నల్ల మచ్చగా కనిపిస్తోందా? కింద ఎంచుకోండి.",
+          options: {
+            all_lines_straight: "✅ అన్ని గీతలు నేరుగా స్పష్టంగా ఉన్నాయి",
+            wavy_distorted_lines: "⚠️ గీతలు అలలలా వంకరగా ఉన్నాయి",
+            dark_patch_missing_spots: "🚨 నల్ల మచ్చ / గీతలు కనిపించట్లేదు"
+          }
+        }
+      },
+      ml: {
+        startBtn: "🔬 45 സെക്കൻഡ് ഓൺ-സ്ക്രീൻ കാഴ്ച പരിശോധന (ഐച്ഛികം)",
+        retakeBtn: "✓ കാഴ്ച പരിശോധന പൂർത്തിയായി (വീണ്ടും പരിശോധിക്കുക)",
+        listenBtn: "🔊 നിർദ്ദേശങ്ങൾ കേൾക്കുക",
+        skipBtn: "റിപ്പോർട്ടിലേക്ക് പോവുക ⏭️",
+        emergencyAlert: "⚠️ ക്ലിനിക്കൽ സുരക്ഷാ മുന്നറിയിപ്പ്: റെറ്റിന തകരാർ സംശയിക്കുന്നു. ഉടൻ തന്നെ നേത്രരോഗ വിദഗ്ദ്ധനെ കാണുക.",
+        duochrome: {
+          title: "🔬 പരിശോധന 1/3: ചുവപ്പ്-പച്ച ഡ്യുവോക്രോം ബാലൻസ്",
+          subtitle: "നേത്ര കേന്ദ്രീകരണ സമതുലിതാവസ്ഥ പരിശോധിക്കുന്നു",
+          prompt: "രണ്ട് നിറങ്ങളിലുമുള്ള 'E' അക്ഷരം ശ്രദ്ധിക്കുക. ഏത് 'E' ആണ് കൂടുതൽ തെളിഞ്ഞു അല്ലെങ്കിൽ വ്യക്തമായി കാണുന്നത്?",
+          audio: "ദയവായി സ്ക്രീനിലെ ചുവപ്പും പച്ചയും ഭാഗങ്ങൾ ശ്രദ്ധിക്കുക. രണ്ടിലും ഇ അക്ഷരമുണ്ട്. നിങ്ങളുടെ കാഴ്ചയ്ക്ക് ഏത് അക്ഷരമാണ് കൂടുതൽ വ്യക്തമായി കാണുന്നത്? ചുവപ്പ് വ്യക്തമെങ്കിൽ ചുവന്ന ബട്ടൺ, പച്ചയെങ്കിൽ പച്ച ബട്ടൺ, രണ്ടും തുല്യമെങ്കിൽ തുല്യം ബട്ടൺ അമർത്തുക.",
+          options: {
+            red_clearer: "🔴 ചുവപ്പ് ഭാഗം കൂടുതൽ വ്യക്തം",
+            green_clearer: "🟢 പച്ച ഭാഗം കൂടുതൽ വ്യക്തം",
+            equally_sharp: "⚖️ രണ്ടും തുല്യമായി വ്യക്തം"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 പരിശോധന 2/3: ആസ്റ്റിഗ്മാറ്റിക് ക്ലോക്ക് ഡയൽ",
+          subtitle: "സിലിണ്ടർ കാഴ്ച വൈകല്യവും ദിശയും കണ്ടെത്തുന്നു",
+          prompt: "എല്ലാ കറുത്ത വരകളും ഒരേപോലെ വ്യക്തമാണോ, അതോ ഏതെങ്കിലും പ്രത്യേക ദിശയിലെ വര കൂടുതൽ കട്ടിയിലോ കറുപ്പിലോ കാണുന്നുണ്ടോ?",
+          audio: "ഈ ഡയലിലെ കറുത്ത വരകൾ ശ്രദ്ധിക്കുക. എല്ലാ വരകളും ഒരേപോലെയാണോ കാണുന്നത്? അതോ ലംബമായ വരയോ, തിരശ്ചീന വരയോ, ചരിഞ്ഞ വരയോ കൂടുതൽ കട്ടിയുള്ളതായി തോന്നുന്നുണ്ടോ? താഴെ തിരഞ്ഞെടുക്കുക.",
+          options: {
+            all_lines_equal: "⚪ എല്ലാ വരകളും ഒരേപോലെയാണ്",
+            "12_to_6": "↕️ ലംബമായ (12-6) വര കറുപ്പ്",
+            "9_to_3": "↔️ തിരശ്ചീന (9-3) വര കറുപ്പ്",
+            "10_to_4": "↗️ ചരിഞ്ഞ വരകൾ കറുപ്പ്"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 പരിശോധന 3/3: ആംസ്‌ലർ ഗ്രിഡ് മാക്യുലർ പരിശോധന",
+          subtitle: "റെറ്റിനയുടെ കേന്ദ്രഭാഗത്തെ തകരാറുകൾ കണ്ടെത്തുന്നു",
+          prompt: "ഒരു കണ്ണ് പൊത്തി നടുവിലെ കറുത്ത കുത്തിൽ നോക്കുക. എല്ലാ വരകളും നേരെയാണോ, അതോ വളഞ്ഞതോ കറുത്ത പാടുകളോ കാണുന്നുണ്ടോ?",
+          audio: "ദയവായി ഒരു കണ്ണ് അടച്ചുപിടിച്ച് നടുവിലെ കറുത്ത ബിന്ദുവിൽ മാത്രം നോക്കുക. എല്ലാ വരകളും നേരെയാണോ കാണുന്നത്? അതോ വളഞ്ഞുപുളഞ്ഞതാണോ, അല്ലെങ്കിൽ ഇരുണ്ട പാടുകൾ കാണുന്നുണ്ടോ? താഴെ രേഖപ്പെടുത്തുക.",
+          options: {
+            all_lines_straight: "✅ എല്ലാ വരകളും നേരെ വ്യക്തമാണ്",
+            wavy_distorted_lines: "⚠️ വരകൾ വളഞ്ഞതായി കാണുന്നു",
+            dark_patch_missing_spots: "🚨 കറുത്ത പാട് / വരകൾ കാണാനില്ല"
+          }
+        }
+      },
+      en: {
+        startBtn: "🔬 Take 45s On-Screen Vision Check (Optional)",
+        retakeBtn: "✓ Vision Check Completed (Retake)",
+        listenBtn: "🔊 Listen Instructions",
+        skipBtn: "Done / Skip &rarr;",
+        emergencyAlert: "⚠️ CLINICAL SAFETY HALT: On-screen test flagged a potential central retinal/macular disturbance. Marked for urgent ophthalmology evaluation.",
+        duochrome: {
+          title: "🔬 Test 1 of 3: Red-Green Duochrome Balance",
+          subtitle: "Checks spherical accommodation balance (myopic vs hyperopic tendency)",
+          prompt: "Looking at both halves with your current vision, which letter 'E' appears darker, sharper, or more defined?",
+          audio: "Please look at both the red and green sides on the screen. Which letter 'E' appears darker, sharper, or clearer to your vision? Tap red if red is clearer, green if green is clearer, or equally sharp if both look identical.",
+          options: {
+            red_clearer: "🔴 Red Half is Sharper",
+            green_clearer: "🟢 Green Half is Sharper",
+            equally_sharp: "⚖️ Both Equally Sharp"
+          }
+        },
+        astigmatic_dial: {
+          title: "🔬 Test 2 of 3: Astigmatic Clock Dial",
+          subtitle: "Detects uncorrected cylinder astigmatism and blur axis",
+          prompt: "Do all radiating black lines appear equally sharp, or are lines in one particular direction darker, bolder, or thicker?",
+          audio: "Please observe the black lines on the clock dial. Do all radiating lines look equally sharp, or are vertical, horizontal, or oblique lines darker and thicker? Tap your answer below.",
+          options: {
+            all_lines_equal: "⚪ All Lines Look Equal",
+            "12_to_6": "↕️ Vertical (12-6) Darker",
+            "9_to_3": "↔️ Horizontal (9-3) Darker",
+            "10_to_4": "↗️ Oblique Darker"
+          }
+        },
+        amsler_grid: {
+          title: "🔬 Test 3 of 3: Amsler Grid Macular Screening",
+          subtitle: "Checks central 10° visual field for macular distortion or blind spots",
+          prompt: "Cover one eye and focus directly on the center black dot. Are all grid lines straight and square, or do you notice any wavy distortion or missing areas?",
+          audio: "Cover one eye and look directly at the center black dot. Are all grid lines straight and square, or do you notice wavy lines or missing dark patches? Please select your observation below.",
+          options: {
+            all_lines_straight: "✅ All Lines Straight & Clear",
+            wavy_distorted_lines: "⚠️ Lines Look Wavy / Bent",
+            dark_patch_missing_spots: "🚨 Dark Patch / Missing Lines"
+          }
+        }
+      }
+    };
+
+    const ZEISS_I18N = {
+      kn: {
+        header: "💎 ನಿಮ್ಮ ದೃಷ್ಟಿಗೆ ಹೊಂದಿಕೆಯಾದ ZEISS ಕಣ್ಣಿನ ಮಸೂರ ಪರಿಹಾರ",
+        coatingLabel: "ಶಿಫಾರಸು ಮಾಡಿದ ಲೇಪನ",
+        indexLabel: "ಮಸೂರ ದಪ್ಪ (Index)",
+        listenBtn: "🔊 ಝೈಸ್ ಮಸೂರ ಶಿಫಾರಸು ಆಲಿಸಿ",
+        families: {
+          smartlife: "ನಿಮ್ಮ ವಯಸ್ಸು ಮತ್ತು ಹತ್ತಿರದ ಓದುವಿಕೆ ಅಗತ್ಯಗಳಿಗೆ ಅನುಗುಣವಾಗಿ, ಝೈಸ್ ಸ್ಮಾರ್ಟ್‌ಲೈಫ್ ಪ್ರೊಗ್ರೆಸ್ಸಿವ್ ಮಸೂರಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ. ಇದು ದೂರ, ಮಧ್ಯಂತರ ಮತ್ತು ಮೊಬೈಲ್ ಓದುವಿಕೆಗೆ ನೈಸರ್ಗಿಕ, ಸುಲಭ ಪರಿವರ್ತನೆಯನ್ನು ಒದಗಿಸುತ್ತದೆ.",
+          digital: "ದೀರ್ಘಾವಧಿಯ ಮೊಬೈಲ್ ಮತ್ತು ಕಂಪ್ಯೂಟರ್ ಪರದೆಯ ಬಳಕೆಯ ಕಣ್ಣಿನ ಆಯಾಸವನ್ನು ಕಡಿಮೆ ಮಾಡಲು, ಝೈಸ್ ಡಿಜಿಟಲ್ ಲೆನ್ಸ್ ಮತ್ತು ಡ್ಯುರಾವಿಷನ್ ಬ್ಲೂಪ್ರೊಟೆಕ್ಟ್ ಲೇಪನವನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.",
+          drivesafe: "ರಾತ್ರಿ ಡ್ರೈವಿಂಗ್ ಮತ್ತು ಎದುರಿನ ವಾಹನಗಳ ತೀಕ್ಷ್ಣ ಹೆಡ್‌ಲೈಟ್ ಬೆಳಕಿನ ಗ್ಲೇರ್ ಅನ್ನು ನಿಯಂತ್ರಿಸಲು, ಝೈಸ್ ಡ್ರೈವ್‌ಸೇಫ್ ಮಸೂರಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ. ಇದು ಮುಸ್ಸಂಜೆ ಮತ್ತು ರಾತ್ರಿಯಲ್ಲೂ ಕಣ್ಣಿಗೆ ಹೆಚ್ಚಿನ ಸ್ಪಷ್ಟತೆಯನ್ನು ನೀಡುತ್ತದೆ.",
+          clearview: "ಸ್ಟ್ಯಾಂಡರ್ಡ್ ಮಸೂರಗಳಿಗಿಂತ ಮೂರು ಪಟ್ಟು ದೊಡ್ಡದಾದ ಸ್ಪಷ್ಟ ದೃಷ್ಟಿ ವಲಯವನ್ನು ನೀಡುವ ಝೈಸ್ ಕ್ಲಿಯರ್‌ವ್ಯೂ ಫ್ರೀಫಾರ್ಮ್ ಸಿಂಗಲ್ ವಿಷನ್ ಮಸೂರಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ. ಇದು ಅತ್ಯಂತ ತೆಳುವಾದ ಮತ್ತು ಚಪ್ಪಟೆಯಾದ ಪ್ರೊಫೈಲ್ ಹೊಂದಿದೆ."
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `ನಿಮ್ಮ ಕಣ್ಣಿನ ದೃಷ್ಟಿ ಪ್ರೊಫೈಲ್ ಪ್ರಕಾರ, ಝೈಸ್ ${lens} ಮಸೂರ ಹಾಗೂ ${coating} ಲೇಪನವನ್ನು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ. ${explanation}`
+      },
+      hi: {
+        header: "💎 आपकी दृष्टि के लिए विशेष ZEISS लेंस समाधान",
+        coatingLabel: "अनुशंसित कोटिंग",
+        indexLabel: "लेंस इंडेक्स",
+        listenBtn: "🔊 ZEISS लेंस अनुशंसा सुनें",
+        families: {
+          smartlife: "आपकी आयु और पास के पढ़ने की आवश्यकताओं के आधार पर, ज़ाइस स्मार्टलाइफ प्रोग्रेसिव लेंस की अनुशंसा की गई है। यह दूर, मध्यम दूरी और मोबाइल पढ़ने के लिए स्वाभाविक व सुगम स्पष्टता देता है।",
+          digital: "लंबे समय तक स्क्रीन और मोबाइल इस्तेमाल से होने वाली आंखों की थकान को कम करने के लिए, ज़ाइस डिजिटल लेंस और ड्यूराविज़न ब्लू-प्रोटेक्ट कोटिंग की अनुशंसा की गई है।",
+          drivesafe: "रात में ड्राइविंग और सामने से आने वाली गाड़ियों की चकाचौंध को नियंत्रित करने के लिए, ज़ाइस ड्राइवसेफ लेंस की अनुशंसा की गई है। यह कम रोशनी में भी स्पष्ट दृष्टि प्रदान करता है।",
+          clearview: "मानक लेंसों की तुलना में 3 गुना बड़ा स्पष्ट दृष्टि क्षेत्र प्रदान करने वाले ज़ाइस क्लियरव्यू फ्रीफॉर्म सिंगल विजन लेंस की अनुशंसा की गई है। यह पतला और हल्का है।"
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `आपकी दृष्टि प्रोफ़ाइल के अनुसार, ज़ाइस ${lens} लेंस और ${coating} कोटिंग की अनुशंसा की जाती है। ${explanation}`
+      },
+      ta: {
+        header: "💎 உங்கள் பார்வைக்கு ஏற்ற ZEISS லென்ஸ் தீர்வு",
+        coatingLabel: "பரிந்துரைக்கப்பட்ட பூச்சு",
+        indexLabel: "லென்ஸ் குறியீடு",
+        listenBtn: "🔊 ZEISS லென்ஸ் பரிந்துரையைக் கேளுங்கள்",
+        families: {
+          smartlife: "உங்கள் வயது மற்றும் வாசிப்புத் தேவைகளுக்கு ஏற்ப, ZEISS ஸ்மார்ட்லைஃப் புரோகிரசிவ் லென்ஸ்கள் பரிந்துரைக்கப்படுகின்றன. இது தூரம் மற்றும் அருகிலுள்ள பார்வைக்கு மென்மையான பார்வையை வழங்குகிறது.",
+          digital: "நீண்ட நேரம் திரை மற்றும் மொபைல் பயன்படுத்துவதால் ஏற்படும் கண் சோர்வைத் தணிக்க, ZEISS டிஜிட்டல் லென்ஸ் மற்றும் டூராவிஷன் புளூப்ரோடெக்ட் பரிந்துரைக்கப்படுகிறது.",
+          drivesafe: "இரவு நேர வாகனம் ஓட்டுதல் மற்றும் கடுமையான முகப்பு விளக்கு கூச்சத்தைக் குறைக்க, ZEISS டிரைவ்சேஃப் லென்ஸ்கள் பரிந்துரைக்கப்படுகின்றன.",
+          clearview: "வழக்கமான லென்ஸ்களை விட 3 மடங்கு பெரிய தெளிவான பார்வை மண்டலத்தை வழங்கும் ZEISS கிளியர்வியூ சிங்கிள் விஷன் லென்ஸ்கள் பரிந்துரைக்கப்படுகின்றன."
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `உங்கள் பார்வைத் தேவைக்கு ஏற்ப, ZEISS ${lens} லென்ஸ் மற்றும் ${coating} பூச்சு பரிந்துரைக்கப்படுகிறது. ${explanation}`
+      },
+      te: {
+        header: "💎 మీ కంటికి సరిపోయే ZEISS లెన్స్ పరిష్కారం",
+        coatingLabel: "సిఫార్సు చేసిన కోటింగ్",
+        indexLabel: "లెన్స్ ఇండెక్స్",
+        listenBtn: "🔊 ZEISS లెన్స్ సిఫార్సు వినండి",
+        families: {
+          smartlife: "మీ వయస్సు మరియు రీడింగ్ అవసరాలకు అనుగుణంగా, ZEISS స్మార్ట్‌లైఫ్ ప్రోగ్రెసివ్ లెన్స్‌లు సిఫార్సు చేయబడ్డాయి. ఇది దూరం మరియు సమీప దృష్టికి సులభమైన స్పష్టతను అందిస్తుంది.",
+          digital: "ఎక్కువ సమయం స్క్రీన్ వాడకం వల్ల వచ్చే కంటి అలసటను తగ్గించడానికి, ZEISS డిజిటల్ లెన్స్ మరియు డ్యూరావిజన్ బ్లూప్రొటెక్ట్ సిఫార్సు చేయబడింది.",
+          drivesafe: "రాత్రి డ్రైవింగ్ మరియు హెడ్‌లైట్ వెలుగు వల్ల వచ్చే కంటి మిరుమిట్లను తగ్గించడానికి, ZEISS డ్రైవ్‌సేఫ్ లెన్స్‌లు సిఫార్సు చేయబడ్డాయి.",
+          clearview: "సాధారణ లెన్స్‌ల కంటే 3 రెట్లు పెద్దదైన స్పష్టమైన దృష్టి ప్రాంతాన్ని అందించే ZEISS క్లియర్‌వ్యూ సింగిల్ విజన్ లెన్స్‌లు సిఫార్సు చేయబడ్డాయి."
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `మీ విజన్ ప్రొఫైల్ ప్రకారం, ZEISS ${lens} లెన్స్ మరియు ${coating} కోటింగ్ సిఫార్సు చేయబడింది. ${explanation}`
+      },
+      ml: {
+        header: "💎 നിങ്ങളുടെ കാഴ്ചയ്ക്ക് അനുയോജ്യമായ ZEISS ലെൻസ് പരിഹാരം",
+        coatingLabel: "ശുപാർശ ചെയ്യുന്ന കോട്ടിംഗ്",
+        indexLabel: "ലെൻസ് ഇൻഡെക്സ്",
+        listenBtn: "🔊 ZEISS ലെൻസ് വിവരണം കേൾക്കുക",
+        families: {
+          smartlife: "നിങ്ങളുടെ പ്രായത്തിനും വായനാ ആവശ്യങ്ങൾക്കും അനുസൃതമായി, ZEISS സ്മാർട്ട്‌ലൈഫ് പ്രോഗ്രസീവ് ലെൻസുകൾ ശുപാർശ ചെയ്യുന്നു. ഇത് ദൂരവും അടുത്തുമുള്ള കാഴ്ചയ്ക്ക് സുഗമമായ വ്യക്തത നൽകുന്നു.",
+          digital: "കൂടുതൽ സമയം സ്ക്രീൻ ഉപയോഗിക്കുന്നതിലൂടെ ഉണ്ടാകുന്ന കണ്ണിന്റെ ആയാസം കുറയ്ക്കാൻ ZEISS ഡിജിറ്റൽ ലെൻസും ഡ്യൂറാവിഷൻ ബ്ലൂപ്രൊട്ടക്റ്റും ശുപാർശ ചെയ്യുന്നു.",
+          drivesafe: "രാത്രിയിലെ ഡ്രൈവിംഗിനും എതിരെയുള്ള വാഹനങ്ങളുടെ വെളിച്ചം മൂലമുണ്ടാകുന്ന ബുദ്ധിമുട്ടുകൾ കുറയ്ക്കാനും ZEISS ഡ്രൈവ്‌സേഫ് ലെൻസുകൾ ശുപാർശ ചെയ്യുന്നു.",
+          clearview: "സാധാരണ ലെൻസുകളേക്കാൾ മൂന്നിരട്ടി വ്യക്തമായ കാഴ്ചാ മേഖല നൽകുന്ന ZEISS ക്ലിയർവ്യൂ സിംഗിൾ വിഷൻ ലെൻസുകൾ ശുപാർശ ചെയ്യുന്നു."
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `നിങ്ങളുടെ കാഴ്ച പ്രൊഫൈൽ പ്രകാരം, ZEISS ${lens} ലെൻസും ${coating} കോട്ടിംഗും ശുപാർശ ചെയ്യുന്നു. ${explanation}`
+      },
+      en: {
+        header: "💎 Your Matched ZEISS Eyewear Solution",
+        coatingLabel: "Recommended Coating",
+        indexLabel: "Index",
+        listenBtn: "🔊 Listen ZEISS Recommendation",
+        families: {
+          smartlife: "Engineered with SmartView Technology for connected, on-the-move visual behavior. Smooth progression zones ensure seamless dynamic viewing across distance, intermediate screens, and handheld digital devices.",
+          digital: "Features specialized targeted near-power boost (+0.50D to +1.25D) engineered to ease accommodative strain and eye muscle fatigue for prolonged smartphone and computer usage.",
+          drivesafe: "Engineered for clear vision in challenging light, dusk, and night driving. Significantly minimizes blinding glare from incoming modern LED and xenon headlights.",
+          clearview: "Delivers up to 3x larger zones of crystal-clear vision compared to standard stock lenses, with a modern ultra-flat and thin profile."
+        },
+        spokenTemplate: (lens, coating, explanation) =>
+          `Based on your functional vision profile, we recommend ${lens} with ${coating}. ${explanation}`
+      }
+    };
+
     // On-Screen Functional Vision Screening Workflow
     let currentScreeningStep = 0;
     const SCREENING_TESTS = ['duochrome', 'astigmatic_dial', 'amsler_grid'];
+    let lastScreeningSpeechText = '';
+    let lastZeissSpeechText = '';
+
+    function playScreeningAudio() {
+      if (lastScreeningSpeechText) {
+        speakText(lastScreeningSpeechText, 'screeningAudioBtn', 'screeningAudioStatus');
+      }
+    }
+
+    function playZeissAudio() {
+      if (lastZeissSpeechText) {
+        speakText(lastZeissSpeechText, 'zeissAudioBtn', 'zeissAudioStatus');
+      }
+    }
+
+    function updateSummaryButtonsI18n() {
+      const sDict = SCREENING_I18N[currentLanguage] || SCREENING_I18N.en;
+      const btn = document.getElementById('startScreeningBtn');
+      if (btn) {
+        btn.innerText = sDict.startBtn;
+      }
+    }
 
     function startOnScreenScreening() {
       currentScreeningStep = 0;
@@ -1556,9 +1936,10 @@
     function skipScreening() {
       document.getElementById('screeningCard').style.display = 'none';
       document.getElementById('summaryCard').style.display = 'block';
+      const sDict = SCREENING_I18N[currentLanguage] || SCREENING_I18N.en;
       const btn = document.getElementById('startScreeningBtn');
       if (btn) {
-        btn.innerText = '✓ Vision Check Completed (Retake)';
+        btn.innerText = sDict.retakeBtn;
         btn.style.background = '#00875a';
       }
       if (activeProfileId) displayCustomerZeissMatch(activeProfileId);
@@ -1568,11 +1949,22 @@
       const title = document.getElementById('screeningTitle');
       const step = document.getElementById('screeningStepIndicator');
       const content = document.getElementById('screeningContent');
+      const audioBtn = document.getElementById('screeningAudioBtn');
+      const skipBtn = document.getElementById('screeningSkipBtn');
       if (!content) return;
 
+      const langDict = SCREENING_I18N[currentLanguage] || SCREENING_I18N.en;
+      if (audioBtn) audioBtn.innerHTML = langDict.listenBtn;
+      if (skipBtn) skipBtn.innerHTML = langDict.skipBtn;
+
+      const currentTest = SCREENING_TESTS[currentScreeningStep];
+      const testData = langDict[currentTest] || SCREENING_I18N.en[currentTest];
+      lastScreeningSpeechText = testData.audio || '';
+
+      title.innerText = testData.title;
+      step.innerText = testData.subtitle;
+
       if (currentScreeningStep === 0) {
-        title.innerText = '🔬 Test 1 of 3: Red-Green Duochrome Balance';
-        step.innerText = 'Checks spherical accommodation balance (myopic vs hyperopic tendency)';
         content.innerHTML = `
           <div style="max-width: 480px; margin: 0 auto 16px auto;">
             <div style="display: flex; height: 160px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.18);">
@@ -1583,25 +1975,23 @@
                 <span style="font-size: 76px; font-weight: 900; color: #000; font-family: sans-serif;">E</span>
               </div>
             </div>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d;">
-              Looking at both halves with your current vision, which letter <strong>'E'</strong> appears darker, sharper, or more defined?
+            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              ${testData.prompt}
             </p>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #d32f2f;" onclick="submitScreeningAnswer('duochrome', 'red_clearer')">
-              🔴 Red Half is Sharper
+              ${testData.options.red_clearer}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #2e7d32;" onclick="submitScreeningAnswer('duochrome', 'green_clearer')">
-              🟢 Green Half is Sharper
+              ${testData.options.green_clearer}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #0052cc;" onclick="submitScreeningAnswer('duochrome', 'equally_sharp')">
-              ⚖️ Both Equally Sharp
+              ${testData.options.equally_sharp}
             </button>
           </div>
         `;
       } else if (currentScreeningStep === 1) {
-        title.innerText = '🔬 Test 2 of 3: Astigmatic Clock Dial';
-        step.innerText = 'Detects uncorrected cylinder astigmatism and dominant blur axis';
         content.innerHTML = `
           <div style="max-width: 480px; margin: 0 auto 16px auto;">
             <svg width="200" height="200" viewBox="0 0 200 200" style="margin: 0 auto; display: block;">
@@ -1618,28 +2008,26 @@
               <text x="184" y="104" text-anchor="middle" font-size="12" font-weight="bold">3</text>
               <text x="16" y="104" text-anchor="middle" font-size="12" font-weight="bold">9</text>
             </svg>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d;">
-              Do all radiating black lines appear equally sharp, or are lines in one particular direction darker, bolder, or thicker?
+            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              ${testData.prompt}
             </p>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', 'all_lines_equal')">
-              ⚪ All Lines Look Equal
+              ${testData.options.all_lines_equal}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '12_to_6')">
-              ↕️ Vertical (12-6) Darker
+              ${testData.options['12_to_6']}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '9_to_3')">
-              ↔️ Horizontal (9-3) Darker
+              ${testData.options['9_to_3']}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '10_to_4')">
-              ↗️ Oblique Darker
+              ${testData.options['10_to_4']}
             </button>
           </div>
         `;
       } else if (currentScreeningStep === 2) {
-        title.innerText = '🔬 Test 3 of 3: Amsler Grid Macular Screening';
-        step.innerText = 'Checks central 10° visual field for macular distortion or blind spots';
         content.innerHTML = `
           <div style="max-width: 480px; margin: 0 auto 16px auto;">
             <svg width="180" height="180" viewBox="0 0 180 180" style="margin: 0 auto; display: block; background: #ffffff; border: 2.5px solid #000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -1651,19 +2039,19 @@
               <rect width="180" height="180" fill="url(#amsler_grid_pat)" />
               <circle cx="90" cy="90" r="5" fill="#000000"/>
             </svg>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d;">
-              Cover one eye and focus directly on the center black dot. Are all grid lines straight and square, or do you notice any wavy distortion or missing areas?
+            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              ${testData.prompt}
             </p>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #00875a;" onclick="submitScreeningAnswer('amsler_grid', 'all_lines_straight')">
-              ✅ All Lines Straight & Clear
+              ${testData.options.all_lines_straight}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #ff991f;" onclick="submitScreeningAnswer('amsler_grid', 'wavy_distorted_lines')">
-              ⚠️ Lines Look Wavy / Bent
+              ${testData.options.wavy_distorted_lines}
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #de350b;" onclick="submitScreeningAnswer('amsler_grid', 'dark_patch_missing_spots')">
-              🚨 Dark Patch / Missing Lines
+              ${testData.options.dark_patch_missing_spots}
             </button>
           </div>
         `;
@@ -1672,6 +2060,7 @@
 
     async function submitScreeningAnswer(testType, selection) {
       playEarcon('turn');
+      const langDict = SCREENING_I18N[currentLanguage] || SCREENING_I18N.en;
       if (currentSessionId) {
         try {
           const resp = await fetch(`/api/v1/session/${currentSessionId}/screening/${testType}`, {
@@ -1682,7 +2071,8 @@
           const data = await resp.json();
           if (data.is_emergency_flag) {
             playEarcon('alert');
-            alert('⚠️ CLINICAL SAFETY HALT: On-screen test flagged a potential central retinal/macular disturbance. Marked for urgent ophthalmology evaluation.');
+            alert(langDict.emergencyAlert);
+            speakText(langDict.emergencyAlert, 'screeningAudioBtn', 'screeningAudioStatus');
           }
         } catch (err) {
           console.warn('Screening submit error:', err);
@@ -1707,20 +2097,44 @@
         const p = data.profile || data;
         const z = p.zeiss_recommendation;
         if (z) {
+          const zDict = ZEISS_I18N[currentLanguage] || ZEISS_I18N.en;
+          
+          let explanation = z.patient_explanation;
+          const lensName = (z.primary_lens || "").toLowerCase();
+          const lensFam = (z.lens_family || "").toLowerCase();
+          
+          if (lensName.includes('smartlife') || lensFam.includes('smartlife') || lensFam.includes('progressive')) {
+            explanation = zDict.families.smartlife;
+          } else if (lensName.includes('digital') || lensFam.includes('digital')) {
+            explanation = zDict.families.digital;
+          } else if (lensName.includes('drivesafe') || lensFam.includes('drivesafe')) {
+            explanation = zDict.families.drivesafe;
+          } else if (lensName.includes('clearview') || lensFam.includes('clearview')) {
+            explanation = zDict.families.clearview;
+          }
+
+          lastZeissSpeechText = zDict.spokenTemplate(z.primary_lens, z.recommended_coating, explanation);
+
           box.innerHTML = `
             <div style="background: #f0f7ff; border: 2px solid #0052cc; border-radius: 10px; padding: 18px; margin: 16px auto; max-width: 620px; box-shadow: 0 4px 14px rgba(0,82,204,0.1);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <strong style="color: #002b66; font-size: 1.05rem;">💎 Your Matched ZEISS Eyewear Solution</strong>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                <strong style="color: #002b66; font-size: 1.05rem;">${zDict.header}</strong>
                 <span style="background: #0052cc; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">ZEISS Official</span>
               </div>
-              <div style="font-size: 1.1rem; color: #0052cc; font-weight: 700; margin-bottom: 4px;">
+              <div style="font-size: 1.15rem; color: #0052cc; font-weight: 700; margin-bottom: 4px;">
                 ${z.primary_lens}
               </div>
               <div style="font-size: 0.88rem; color: #42526e; margin-bottom: 8px;">
-                <strong>Recommended Coating:</strong> ${z.recommended_coating} &bull; <strong>Index:</strong> ${z.recommended_index}
+                <strong>${zDict.coatingLabel}:</strong> ${z.recommended_coating} &bull; <strong>${zDict.indexLabel}:</strong> ${z.recommended_index}
               </div>
-              <div style="font-size: 0.9rem; color: #172b4d; line-height: 1.5; background: #ffffff; padding: 10px 12px; border-radius: 6px; border: 1px solid #dfe1e6;">
-                ${z.patient_explanation}
+              <div style="font-size: 0.92rem; color: #172b4d; line-height: 1.5; background: #ffffff; padding: 12px 14px; border-radius: 6px; border: 1px solid #dfe1e6; margin-bottom: 12px;">
+                ${explanation}
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <button id="zeissAudioBtn" class="q-audio-btn" style="margin: 0; padding: 8px 16px; font-size: 0.85rem; background: #0052cc; color: white; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;" onclick="playZeissAudio()">
+                  ${zDict.listenBtn}
+                </button>
+                <div id="zeissAudioStatus" style="font-size: 0.8rem; color: #0052cc; display: none;"></div>
               </div>
             </div>
           `;
@@ -1729,6 +2143,7 @@
         console.warn('Could not load customer ZEISS match:', err);
       }
     }
+
   </script>
 </body>
 </html>
