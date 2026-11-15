@@ -61,6 +61,7 @@ class StartSessionRequest(BaseModel):
 class LocalizedOption(BaseModel):
     id: str
     label: str
+    label_en: Optional[str] = None
 
 
 class QuestionPayload(BaseModel):
@@ -68,6 +69,7 @@ class QuestionPayload(BaseModel):
     category: str
     domain: str
     text: str
+    text_en: Optional[str] = None
     options: List[str]
     localized_options: List[LocalizedOption] = Field(default_factory=list)
     tts_audio_base64: Optional[str] = None
@@ -119,16 +121,19 @@ def format_question_payload(q: Question, lang: LanguageCode) -> QuestionPayload:
         audio_b64 = base64.b64encode(tts_res.audio_data_bytes).decode("utf-8")
 
     opts_map = q.options_translations.get(lang_key, {})
+    en_opts_map = q.options_translations.get("en", {})
     localized_options = []
     for opt in q.options:
         label = opts_map.get(opt, opt.replace("_", " ").title())
-        localized_options.append(LocalizedOption(id=opt, label=label))
+        label_en = en_opts_map.get(opt, opt.replace("_", " ").title())
+        localized_options.append(LocalizedOption(id=opt, label=label, label_en=label_en))
 
     return QuestionPayload(
         id=q.id,
         category=q.category.value,
         domain=q.domain.value,
         text=localized_text,
+        text_en=q.text_en,
         options=q.options,
         localized_options=localized_options,
         tts_audio_base64=audio_b64,

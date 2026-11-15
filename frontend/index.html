@@ -854,9 +854,15 @@
       
       const listenText = UI_I18N.listenBtn[currentLanguage] || UI_I18N.listenBtn.en;
       const chatArea = document.getElementById('chatArea');
+
+      const englishQuestionSub = (currentLanguage !== 'en' && q.text_en)
+        ? `<div style="font-size: 0.82rem; color: #5e6c84; font-weight: normal; margin-top: 4px; font-style: italic; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 3px;">🇬🇧 ${q.text_en}</div>`
+        : '';
+
       chatArea.innerHTML = `
         <div class="bubble bot">
           <div class="q-text">${q.text}</div>
+          ${englishQuestionSub}
           <button class="q-audio-btn" id="listenBtn" onclick="speakText('${q.text.replace(/'/g, "\\'")}')">
             ${listenText}
           </button>
@@ -895,7 +901,10 @@
       optionItems.forEach(optItem => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
-        btn.innerHTML = `<span>${optItem.label}</span> <span>&rarr;</span>`;
+        const englishOptSub = (currentLanguage !== 'en' && optItem.label_en)
+          ? `<div style="font-size: 0.75rem; color: #5e6c84; font-weight: normal; margin-top: 2px;">${optItem.label_en}</div>`
+          : '';
+        btn.innerHTML = `<div style="text-align: left; flex: 1;"><div>${optItem.label}</div>${englishOptSub}</div> <span style="margin-left: 8px;">&rarr;</span>`;
         btn.onclick = () => submitOption(optItem.id, optItem.label);
         optionsContainer.appendChild(btn);
       });
@@ -2008,6 +2017,18 @@
       const testData = langDict[currentTest] || SCREENING_I18N.en[currentTest];
       lastScreeningSpeechText = testData.audio || '';
 
+      const enTestData = SCREENING_I18N.en[currentTest] || {};
+      const enPromptSub = (currentLanguage !== 'en' && enTestData.prompt)
+        ? `<div style="font-size: 0.8rem; color: #5e6c84; font-style: italic; margin-top: 4px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 3px;">🇬🇧 ${enTestData.prompt}</div>`
+        : '';
+
+      function getEnOptSub(optKey) {
+        if (currentLanguage !== 'en' && enTestData.options && enTestData.options[optKey]) {
+          return `<div style="font-size: 0.74rem; color: #5e6c84; font-weight: normal; margin-top: 2px;">${enTestData.options[optKey]}</div>`;
+        }
+        return '';
+      }
+
       title.innerText = testData.title;
       step.innerText = testData.subtitle;
 
@@ -2022,19 +2043,20 @@
                 <span style="font-size: 76px; font-weight: 900; color: #000; font-family: sans-serif;">E</span>
               </div>
             </div>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
-              ${testData.prompt}
-            </p>
+            <div style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              <div>${testData.prompt}</div>
+              ${enPromptSub}
+            </div>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #d32f2f;" onclick="submitScreeningAnswer('duochrome', 'red_clearer')">
-              ${testData.options.red_clearer}
+              <div style="text-align: center;"><div>${testData.options.red_clearer}</div>${getEnOptSub('red_clearer')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #2e7d32;" onclick="submitScreeningAnswer('duochrome', 'green_clearer')">
-              ${testData.options.green_clearer}
+              <div style="text-align: center;"><div>${testData.options.green_clearer}</div>${getEnOptSub('green_clearer')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #0052cc;" onclick="submitScreeningAnswer('duochrome', 'equally_sharp')">
-              ${testData.options.equally_sharp}
+              <div style="text-align: center;"><div>${testData.options.equally_sharp}</div>${getEnOptSub('equally_sharp')}</div>
             </button>
           </div>
         `;
@@ -2055,22 +2077,23 @@
               <text x="184" y="104" text-anchor="middle" font-size="12" font-weight="bold">3</text>
               <text x="16" y="104" text-anchor="middle" font-size="12" font-weight="bold">9</text>
             </svg>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
-              ${testData.prompt}
-            </p>
+            <div style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              <div>${testData.prompt}</div>
+              ${enPromptSub}
+            </div>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', 'all_lines_equal')">
-              ${testData.options.all_lines_equal}
+              <div style="text-align: center;"><div>${testData.options.all_lines_equal}</div>${getEnOptSub('all_lines_equal')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '12_to_6')">
-              ${testData.options['12_to_6']}
+              <div style="text-align: center;"><div>${testData.options['12_to_6']}</div>${getEnOptSub('12_to_6')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '9_to_3')">
-              ${testData.options['9_to_3']}
+              <div style="text-align: center;"><div>${testData.options['9_to_3']}</div>${getEnOptSub('9_to_3')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center;" onclick="submitScreeningAnswer('astigmatic_dial', '10_to_4')">
-              ${testData.options['10_to_4']}
+              <div style="text-align: center;"><div>${testData.options['10_to_4']}</div>${getEnOptSub('10_to_4')}</div>
             </button>
           </div>
         `;
@@ -2086,19 +2109,20 @@
               <rect width="180" height="180" fill="url(#amsler_grid_pat)" />
               <circle cx="90" cy="90" r="5" fill="#000000"/>
             </svg>
-            <p style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
-              ${testData.prompt}
-            </p>
+            <div style="margin-top: 14px; font-size: 0.95rem; color: #172b4d; line-height: 1.5;">
+              <div>${testData.prompt}</div>
+              ${enPromptSub}
+            </div>
           </div>
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #00875a;" onclick="submitScreeningAnswer('amsler_grid', 'all_lines_straight')">
-              ${testData.options.all_lines_straight}
+              <div style="text-align: center;"><div>${testData.options.all_lines_straight}</div>${getEnOptSub('all_lines_straight')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #ff991f;" onclick="submitScreeningAnswer('amsler_grid', 'wavy_distorted_lines')">
-              ${testData.options.wavy_distorted_lines}
+              <div style="text-align: center;"><div>${testData.options.wavy_distorted_lines}</div>${getEnOptSub('wavy_distorted_lines')}</div>
             </button>
             <button class="option-btn" style="flex: 1; min-width: 140px; justify-content: center; border-left: 4px solid #de350b;" onclick="submitScreeningAnswer('amsler_grid', 'dark_patch_missing_spots')">
-              ${testData.options.dark_patch_missing_spots}
+              <div style="text-align: center;"><div>${testData.options.dark_patch_missing_spots}</div>${getEnOptSub('dark_patch_missing_spots')}</div>
             </button>
           </div>
         `;
@@ -2412,7 +2436,8 @@
                 <strong>${zDict.coatingLabel}:</strong> ${z.recommended_coating} &bull; <strong>${zDict.indexLabel}:</strong> ${z.recommended_index}
               </div>
               <div style="font-size: 0.92rem; color: #172b4d; line-height: 1.5; background: #ffffff; padding: 12px 14px; border-radius: 6px; border: 1px solid #dfe1e6; margin-bottom: 10px;">
-                ${explanation}
+                <div>${explanation}</div>
+                ${currentLanguage !== 'en' ? `<div style="font-size: 0.8rem; color: #5e6c84; font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #dfe1e6;">🇬🇧 ${z.patient_explanation}</div>` : ''}
               </div>
               
               ${riskHtml}
