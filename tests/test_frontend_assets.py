@@ -67,3 +67,21 @@ def test_voice_narration_integration_in_frontend():
     assert "zeissAudioBtn" in html
     assert "/api/v1/session/speak?text=" in html
 
+
+def test_zeiss_visual_simulator_and_visuconsult_bridge_in_frontend():
+    resp = client.get("/")
+    assert resp.status_code == 200
+    html = resp.text
+
+    # Visual simulator canvas and controls
+    assert "simVisualCanvas" in html
+    assert "setSimMode" in html
+    assert "onSimSliderChange" in html
+    assert "renderSimVisual" in html
+
+    # VISUCONSULT 500 QR and WhatsApp pass
+    assert "visuconsult-qr" in html
+    assert "openWhatsAppPass" in html
+    assert "ZEISS VISUCONSULT 500" in html
+
+

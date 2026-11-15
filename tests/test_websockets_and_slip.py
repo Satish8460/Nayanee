@@ -17,6 +17,17 @@ def test_printable_slip_export():
     assert "Functional Vision Profile" in html
     assert "Pre-Refraction Optical Guidance" in html
     assert "Optometrist Refraction & Clinical Notes" in html
+    assert "ZEISS VISUCONSULT 500 INTAKE PASS" in html
+    assert "<svg" in html
+
+
+def test_visuconsult_qr_code_endpoint():
+    resp = client.get("/api/v1/export/profile/demo-kn-parvathamma/visuconsult-qr")
+    assert resp.status_code == 200
+    assert "image/svg+xml" in resp.headers["content-type"]
+    assert "<svg" in resp.text
+    assert "</svg>" in resp.text
+
 
 
 def test_websocket_realtime_session_flow():

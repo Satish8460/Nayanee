@@ -70,6 +70,18 @@ def build_functional_profile(
         "satisfaction_level": eyewear_sat.selected_option if eyewear_sat else "n/a",
     }
 
+    ergo_q = answers.get("q_ergonomic_working_distance")
+    ergo_status = {
+        "primary_focal_plane": ergo_q.selected_option if ergo_q else "balanced_multi_distance",
+        "is_close_mobile_dominant": ergo_q.selected_option == "handheld_mobile_close" if ergo_q else False,
+    }
+
+    transit_q = answers.get("q_commute_transit_mode")
+    transit_status = {
+        "commute_mode": transit_q.selected_option if transit_q else "unassessed",
+        "is_two_wheeler": transit_q.selected_option == "two_wheeler_bike" if transit_q else False,
+    }
+
     if red_flags:
         status = ReviewStatus.URGENT_MEDICAL_ESCALATION
     elif contradictions:
@@ -92,6 +104,8 @@ def build_functional_profile(
         near_vision_status=near_status,
         lifestyle_occupational_context=lifestyle_status,
         eyewear_history=eyewear_status,
+        ergonomic_task_profile=ergo_status,
+        transit_environmental_vector=transit_status,
         contradictions=contradictions,
         red_flags=red_flags,
         uncertainty_score=round(uncertainty_score, 3),
@@ -104,6 +118,7 @@ def build_functional_profile(
     try:
         from pocs.poc07_zeiss_matcher_and_screening.zeiss_lens_recommender import ZeissLensRecommender
         rec = ZeissLensRecommender.recommend(profile, onscreen_screening_results)
+        profile.progressive_adaptation_risk = rec.progressive_adaptation_risk
         profile.zeiss_recommendation = {
             "primary_lens": rec.primary_lens,
             "lens_family": rec.lens_family,
@@ -113,6 +128,7 @@ def build_functional_profile(
             "patient_explanation": rec.patient_explanation,
             "optician_dispensing_notes": rec.optician_dispensing_notes,
             "lifestyle_triggers": rec.lifestyle_triggers,
+            "progressive_adaptation_risk": rec.progressive_adaptation_risk,
         }
     except Exception as exc:
         profile.zeiss_recommendation = None

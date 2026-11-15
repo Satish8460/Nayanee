@@ -20,6 +20,54 @@ def export_profile_summary_text(profile_id: str):
     return Response(content=text_report, media_type="text/plain; charset=utf-8")
 
 
+def generate_visuconsult_qr_svg(prof) -> str:
+    """Generates a compact SVG QR code compatible with ZEISS VISUCONSULT 500 in-store intake."""
+    try:
+        import qrcode
+        import qrcode.image.svg
+        import io
+        import json
+
+        zeiss = getattr(prof, "zeiss_recommendation", {}) or {}
+        risk = zeiss.get("progressive_adaptation_risk", {})
+        payload = {
+            "schema": "ZEISS_VISUCONSULT_500_V1",
+            "profile_id": prof.profile_id[:12],
+            "patient_name": prof.patient_name,
+            "patient_age": prof.patient_age,
+            "lens": zeiss.get("primary_lens", "ClearView"),
+            "coating": zeiss.get("recommended_coating", "DuraVision"),
+            "index": zeiss.get("recommended_index", "1.56"),
+            "adaptation_risk": risk.get("risk_level", "N/A"),
+            "corridor": zeiss.get("corridor_or_boost", "Standard"),
+        }
+        qr = qrcode.QRCode(
+            version=1,
+            box_size=4,
+            border=1,
+            image_factory=qrcode.image.svg.SvgPathImage,
+        )
+        qr.add_data(json.dumps(payload))
+        qr.make(fit=True)
+        img = qr.make_image()
+        buf = io.BytesIO()
+        img.save(buf)
+        return buf.getvalue().decode("utf-8")
+    except Exception:
+        return ""
+
+
+@router.get("/profile/{profile_id}/visuconsult-qr", response_class=Response)
+def export_visuconsult_qr(profile_id: str):
+    prof = store.get_profile(profile_id)
+    if not prof:
+        raise HTTPException(status_code=404, detail="Profile not found.")
+    svg_data = generate_visuconsult_qr_svg(prof)
+    if not svg_data:
+        raise HTTPException(status_code=500, detail="Failed to generate QR code.")
+    return Response(content=svg_data, media_type="image/svg+xml")
+
+
 @router.get("/profile/{profile_id}/audit-trail")
 def export_profile_audit_trail(profile_id: str):
     prof = store.get_profile(profile_id)
@@ -51,6 +99,27 @@ def export_printable_slip(profile_id: str):
 
     zeiss_block = ""
     if zeiss_rec:
+        risk_data = zeiss_rec.get("progressive_adaptation_risk", {})
+        risk_level = risk_data.get("risk_level", "NOT_APPLICABLE")
+        risk_badge = ""
+        if risk_level != "NOT_APPLICABLE":
+            risk_color = "#de350b" if risk_level == "HIGH" else "#ff991f" if risk_level == "MODERATE" else "#00875a"
+            risk_badge = f"""
+      <div style="margin-top: 6px; font-size: 0.82rem; background: #fff; border: 1px solid {risk_color}; padding: 4px 8px; border-radius: 4px;">
+        <strong style="color: {risk_color};">⚡ Progressive Adaptation Risk: {risk_level} (Score {risk_data.get('score', 0)}/100)</strong><br>
+        <span style="color: #42526e;">Optimal Corridor: {risk_data.get('recommended_corridor_type', 'Balanced')}</span>
+      </div>
+"""
+
+        transit_data = getattr(prof, "transit_environmental_vector", {}) or {}
+        transit_badge = ""
+        if transit_data.get("is_two_wheeler"):
+            transit_badge = """
+      <div style="margin-top: 6px; font-size: 0.82rem; background: #fff3e0; border-left: 3px solid #ff991f; padding: 4px 8px; border-radius: 4px; color: #bf2600;">
+        <strong>🏍️ Two-Wheeler Transit Vector:</strong> High-impact road debris 1.60 material & DuraVision anti-static dust shield indicated.
+      </div>
+"""
+
         zeiss_block = f"""
   <div class="section" style="border: 1.5px solid #0052cc; border-radius: 6px; padding: 10px 14px; background: #f0f7ff;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -66,7 +135,9 @@ def export_printable_slip(profile_id: str):
       <div><strong>Recommended Coating:</strong> {zeiss_rec.get('recommended_coating', 'N/A')}</div>
       <div><strong>Index / Corridor:</strong> {zeiss_rec.get('recommended_index', '1.56')} &bull; {zeiss_rec.get('corridor_or_boost', 'Standard')}</div>
       <div style="margin-top: 4px; font-size: 0.82rem; color: #42526e;"><em>{zeiss_rec.get('patient_explanation', '')}</em></div>
-      <div style="margin-top: 4px; font-size: 0.82rem; color: #0049b0; background: #deebff; padding: 4px 8px; border-radius: 4px;">
+      {risk_badge}
+      {transit_badge}
+      <div style="margin-top: 6px; font-size: 0.82rem; color: #0049b0; background: #deebff; padding: 6px 8px; border-radius: 4px;">
         <strong>Optician Dispensing:</strong> {zeiss_rec.get('optician_dispensing_notes', '')}
       </div>
     </div>
@@ -84,6 +155,25 @@ def export_printable_slip(profile_id: str):
     <div class="section-title">On-Screen Functional Screening Findings</div>
     <div style="font-size: 0.85rem; background: #fafbfc; border: 1px solid #dfe1e6; padding: 8px 12px; border-radius: 4px;">
       {screening_rows}
+    </div>
+  </div>
+"""
+
+    qr_svg = generate_visuconsult_qr_svg(prof)
+    qr_block = ""
+    if qr_svg:
+        qr_block = f"""
+  <div class="section" style="border: 1.5px solid #0052cc; border-radius: 6px; padding: 10px 14px; background: #f9fbfd;">
+    <div style="display: flex; gap: 14px; align-items: center;">
+      <div style="width: 100px; height: 100px; flex-shrink: 0; background: white; padding: 4px; border: 1px solid #dfe1e6; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+        {qr_svg}
+      </div>
+      <div>
+        <div style="font-weight: bold; color: #002b66; font-size: 0.95rem; margin-bottom: 3px;">ZEISS VISUCONSULT 500 INTAKE PASS</div>
+        <div style="font-size: 0.8rem; color: #42526e; line-height: 1.4;">
+          Scan with practice tablet or 2D scanner to import anamnesis, screening findings & optical recommendations directly into <strong>ZEISS VISUCONSULT 500</strong>.
+        </div>
+      </div>
     </div>
   </div>
 """
@@ -205,6 +295,8 @@ def export_printable_slip(profile_id: str):
   {zeiss_block}
 
   {screening_block}
+
+  {qr_block}
 
   <div class="opto-action">
     <div style="font-weight: bold; margin-bottom: 6px; color: #002b66;">Optometrist Refraction & Clinical Notes</div>

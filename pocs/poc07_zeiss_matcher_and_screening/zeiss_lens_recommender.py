@@ -18,6 +18,7 @@ class ZeissLensRecommendation:
     patient_explanation: str
     optician_dispensing_notes: str
     lifestyle_triggers: List[str] = field(default_factory=list)
+    progressive_adaptation_risk: Dict[str, Any] = field(default_factory=dict)
 
 
 class ZeissLensRecommender:
@@ -38,6 +39,8 @@ class ZeissLensRecommender:
         glare_difficulty = profile.distance_vision_status.get("night_glare_difficulty", "")
         outdoor_sun = profile.lifestyle_occupational_context.get("outdoor_sun_exposure", "")
         dist_clarity = profile.distance_vision_status.get("distance_clarity_status", "")
+        ergo_plane = profile.ergonomic_task_profile.get("primary_focal_plane", "")
+        commute_mode = profile.transit_environmental_vector.get("commute_mode", "")
 
         is_presbyope = (
             age >= 42
@@ -46,6 +49,7 @@ class ZeissLensRecommender:
         is_heavy_screen = screen_hours in ["five_to_eight", "more_than_eight"]
         is_night_glare = glare_difficulty in ["moderate_glare", "severe_glare_avoids_driving"]
         is_outdoor_heavy = outdoor_sun in ["majority_outdoors_heavy_sun", "one_to_three_hours_outdoors"]
+        is_two_wheeler = commute_mode == "two_wheeler_bike"
 
         # Track triggers
         if is_presbyope:
@@ -56,27 +60,37 @@ class ZeissLensRecommender:
             triggers.append(f"Night driving glare and reduced mesopic contrast")
         if is_outdoor_heavy:
             triggers.append(f"Active outdoor UV and bright sunlight exposure")
+        if is_two_wheeler:
+            triggers.append("Daily two-wheeler commuter exposed to open wind, dust, and oncoming LED headlights")
 
-        # 2. Determine Primary Lens & Family
+        # 2. Determine Primary Lens & Family & Corridor
         if is_presbyope:
             lens_family = "ZEISS Progressive Portfolio"
             if is_heavy_screen:
                 primary_lens = "ZEISS SmartLife Progressive (Near Priority)"
-                corridor = "Near/Intermediate Corridor Priority (Customized for digital multitasking)"
+                if ergo_plane == "handheld_mobile_close":
+                    corridor = "Short Corridor 14mm (Rapid Mobile & Smartphone Drop)"
+                    triggers.append("Smartphone-dominant working distance (< 35cm)")
+                else:
+                    corridor = "Near/Intermediate Corridor Priority (Customized for digital multitasking)"
                 patient_exp = (
                     "Designed for adults experiencing natural reading difficulty. Provides smooth, "
                     "seamless focus from phone screens to across the room without lines."
                 )
             else:
                 primary_lens = "ZEISS Progressive Light 3D"
-                corridor = "Balanced Universal Progression Corridor"
+                if ergo_plane == "desktop_monitor_desk":
+                    corridor = "Extended Intermediate Corridor 17mm (Desktop & Screen Depth)"
+                    triggers.append("Desktop/counter-dominant working distance (60-75cm)")
+                else:
+                    corridor = "Balanced Universal Progression Corridor (15mm)"
                 patient_exp = (
                     "Effortless transition across all distances (near, intermediate, far) "
                     "with wide, clear reading zones for first-time progressive wearers."
                 )
             dispensing_notes = (
                 "Verify pupil center height and monocular fitting heights in chosen frame. "
-                "Ensure minimum fitting height >= 14mm."
+                "Ensure minimum fitting height matches corridor."
             )
 
         elif is_heavy_screen and age < 42:
@@ -117,7 +131,9 @@ class ZeissLensRecommender:
             )
 
         # 3. Determine Recommended Coating
-        if is_night_glare:
+        if is_two_wheeler and is_night_glare:
+            coating = "ZEISS DuraVision DriveSafe + Platinum (Dust & High-Beam Glare Shield)"
+        elif is_night_glare:
             coating = "ZEISS DuraVision DriveSafe"
         elif is_heavy_screen:
             coating = "ZEISS DuraVision BlueProtect (400–455nm Selective Filter)"
@@ -126,8 +142,14 @@ class ZeissLensRecommender:
         else:
             coating = "ZEISS DuraVision Platinum UV (Ultra-Hard Scratch Resistance + Anti-Static)"
 
-        # 4. Determine Recommended Index
-        if is_presbyope and is_heavy_screen:
+        # 4. Determine Recommended Index & Material
+        if is_two_wheeler:
+            rec_index = "1.60 High-Impact Polycarbonate / Trivex (Road Safety)"
+            dispensing_notes += (
+                " [TWO-WHEELER ROAD SAFETY: Mandatory shatter-resistant 1.60 high-impact material "
+                "and dust-repellent oleophobic coating for bike/scooter riding.]"
+            )
+        elif is_presbyope and is_heavy_screen:
             rec_index = "1.60 High Index (Thin & Lightweight)"
         elif is_outdoor_heavy:
             rec_index = "1.60 Impact-Resistant (Extra Durability)"
@@ -147,6 +169,55 @@ class ZeissLensRecommender:
             if duochrome.get("tendency"):
                 dispensing_notes += f" [DUOCHROME PRE-REFRACTION: {duochrome.get('tendency')}]."
 
+        # 6. Progressive Adaptation & Non-Tolerance Risk Calculation
+        adaptation_score = 0
+        risk_factors = []
+        if is_presbyope:
+            current_modality = profile.eyewear_history.get("current_modality", "never_worn")
+            if current_modality in ["never_worn", "distance_only", "readers_only"]:
+                adaptation_score += 30
+                risk_factors.append("First-time progressive wearer transitioning from single-vision/readers")
+            if ergo_plane == "handheld_mobile_close":
+                adaptation_score += 25
+                risk_factors.append("Close handheld reading posture (< 35cm) demands steep downward version")
+            if onscreen_test_results:
+                astig_finding = onscreen_test_results.get("astigmatic_dial", {})
+                if astig_finding.get("astigmatism_suspected"):
+                    adaptation_score += 25
+                    risk_factors.append("Uncorrected cylinder astigmatism creates peripheral corridor swim")
+            if age >= 52:
+                adaptation_score += 20
+                risk_factors.append(f"High reading addition demand at age {age}")
+
+            if adaptation_score >= 65:
+                risk_level = "HIGH"
+                dispensing_notes += (
+                    f" [PROGRESSIVE ADAPTATION ALERT: High non-tolerance risk (Score {adaptation_score}/100). "
+                    f"Recommend ZEISS SmartLife Individual soft corridor + in-store head-turn dynamic counseling.]"
+                )
+            elif adaptation_score >= 35:
+                risk_level = "MODERATE"
+                dispensing_notes += (
+                    f" [PROGRESSIVE ADAPTATION NOTE: Moderate non-tolerance risk (Score {adaptation_score}/100). "
+                    f"Advise 3-day gradual gaze adaptation protocol.]"
+                )
+            else:
+                risk_level = "LOW"
+
+            progressive_adaptation = {
+                "score": adaptation_score,
+                "risk_level": risk_level,
+                "risk_factors": risk_factors,
+                "recommended_corridor_type": "ZEISS SmartLife Individual (Soft Corridor)" if risk_level == "HIGH" else "ZEISS SmartLife Plus (Balanced)",
+            }
+        else:
+            progressive_adaptation = {
+                "score": 0,
+                "risk_level": "NOT_APPLICABLE",
+                "risk_factors": [],
+                "recommended_corridor_type": "N/A (Single Vision / Digital)",
+            }
+
         return ZeissLensRecommendation(
             primary_lens=primary_lens,
             lens_family=lens_family,
@@ -156,4 +227,5 @@ class ZeissLensRecommender:
             patient_explanation=patient_exp,
             optician_dispensing_notes=dispensing_notes,
             lifestyle_triggers=triggers,
+            progressive_adaptation_risk=progressive_adaptation,
         )

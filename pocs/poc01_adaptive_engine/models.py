@@ -118,3 +118,6 @@ class FunctionalVisionProfile(BaseModel):
     engine_type: str = "adaptive"
     onscreen_screening_results: Dict[str, Any] = Field(default_factory=dict)
     zeiss_recommendation: Optional[Dict[str, Any]] = None
+    ergonomic_task_profile: Dict[str, Any] = Field(default_factory=dict)
+    transit_environmental_vector: Dict[str, Any] = Field(default_factory=dict)
+    progressive_adaptation_risk: Dict[str, Any] = Field(default_factory=dict)

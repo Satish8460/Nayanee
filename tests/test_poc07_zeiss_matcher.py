@@ -136,3 +136,37 @@ def test_deterministic_stability_100_runs():
         assert subsequent.recommended_coating == first_res.recommended_coating
         assert subsequent.corridor_or_boost == first_res.corridor_or_boost
         assert subsequent.optician_dispensing_notes == first_res.optician_dispensing_notes
+
+
+def test_two_wheeler_transit_escalates_to_high_impact_and_drivesafe():
+    prof = create_base_profile(age=28, glare="moderate_glare")
+    prof.transit_environmental_vector = {"commute_mode": "two_wheeler_bike", "is_two_wheeler": True}
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "DriveSafe" in rec.recommended_coating
+    assert "1.60 High-Impact" in rec.recommended_index
+    assert "TWO-WHEELER ROAD SAFETY" in rec.optician_dispensing_notes
+
+
+def test_progressive_adaptation_risk_calculation_high():
+    prof = create_base_profile(age=54, near="significant_blur_holds_far")
+    prof.eyewear_history = {"current_modality": "distance_only"}
+    prof.ergonomic_task_profile = {"primary_focal_plane": "handheld_mobile_close"}
+
+    screening = {"astigmatic_dial": {"astigmatism_suspected": True, "dominant_meridian": "12_to_6"}}
+    rec = ZeissLensRecommender.recommend(prof, screening)
+
+    risk = rec.progressive_adaptation_risk
+    assert risk["risk_level"] == "HIGH"
+    assert risk["score"] >= 65
+    assert "SmartLife Individual" in risk["recommended_corridor_type"]
+    assert "PROGRESSIVE ADAPTATION ALERT" in rec.optician_dispensing_notes
+
+
+def test_ergonomic_distance_short_corridor_mapping():
+    prof = create_base_profile(age=46, screen="five_to_eight", near="significant_blur_holds_far")
+    prof.ergonomic_task_profile = {"primary_focal_plane": "handheld_mobile_close"}
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "Short Corridor 14mm" in rec.corridor_or_boost
+
