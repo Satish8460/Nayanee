@@ -137,7 +137,22 @@ class AdaptiveAnamnesisEngine:
                 if question.domain == FunctionalDomain.LIFESTYLE:
                     age_boost = 1.20
 
-        return question.base_information_weight * domain_unc * chief_boost * age_boost
+        # Non-brittle optometric gender prior modulation
+        gender_boost = 1.0
+        if self.patient_gender:
+            gen = self.patient_gender.lower().strip()
+            if gen == "female":
+                # Shorter anthropometric forearm reach (32-35cm) & peri-menopausal dry eye / tear film instability
+                if self.patient_age and self.patient_age >= 40:
+                    if question.id == "q_ocular_surface_dryness":
+                        gender_boost = 1.25
+                    elif question.domain == FunctionalDomain.NEAR or question.id == "q_fine_task_fatigue":
+                        gender_boost = 1.15
+            elif gen == "male":
+                if question.domain == FunctionalDomain.DISTANCE:
+                    gender_boost = 1.05
+
+        return question.base_information_weight * domain_unc * chief_boost * age_boost * gender_boost
 
     def check_contradictions(self, new_record: AnswerRecord) -> None:
         for rule in CONTRADICTION_RULES:

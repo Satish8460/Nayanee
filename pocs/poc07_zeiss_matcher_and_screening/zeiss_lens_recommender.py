@@ -35,12 +35,14 @@ class ZeissLensRecommender:
 
         # 1. Extract functional indicators
         near_status = profile.near_vision_status.get("mobile_reading_status", "")
+        dryness_status = profile.near_vision_status.get("ocular_surface_dryness", "")
         screen_hours = profile.lifestyle_occupational_context.get("daily_screen_hours", "")
         glare_difficulty = profile.distance_vision_status.get("night_glare_difficulty", "")
         outdoor_sun = profile.lifestyle_occupational_context.get("outdoor_sun_exposure", "")
         dist_clarity = profile.distance_vision_status.get("distance_clarity_status", "")
         ergo_plane = profile.ergonomic_task_profile.get("primary_focal_plane", "")
         commute_mode = profile.transit_environmental_vector.get("commute_mode", "")
+        gender = (profile.patient_gender or "").lower().strip()
 
         is_presbyope = (
             age >= 42
@@ -68,9 +70,9 @@ class ZeissLensRecommender:
             lens_family = "ZEISS Progressive Portfolio"
             if is_heavy_screen:
                 primary_lens = "ZEISS SmartLife Progressive (Near Priority)"
-                if ergo_plane == "handheld_mobile_close":
-                    corridor = "Short Corridor 14mm (Rapid Mobile & Smartphone Drop)"
-                    triggers.append("Smartphone-dominant working distance (< 35cm)")
+                if ergo_plane == "handheld_mobile_close" or gender == "female":
+                    corridor = "Short Corridor 14mm (Rapid Mobile & Female Arm Reach 33cm)"
+                    triggers.append("Closer reading posture (< 35cm) tailored with 14mm corridor")
                 else:
                     corridor = "Near/Intermediate Corridor Priority (Customized for digital multitasking)"
                 patient_exp = (
@@ -82,6 +84,9 @@ class ZeissLensRecommender:
                 if ergo_plane == "desktop_monitor_desk":
                     corridor = "Extended Intermediate Corridor 17mm (Desktop & Screen Depth)"
                     triggers.append("Desktop/counter-dominant working distance (60-75cm)")
+                elif gender == "female":
+                    corridor = "Short Corridor 14mm (Anthropometric Female Arm Reach 33cm)"
+                    triggers.append("Female anthropometric shorter arm reach (32-35cm)")
                 else:
                     corridor = "Balanced Universal Progression Corridor (15mm)"
                 patient_exp = (
@@ -149,12 +154,24 @@ class ZeissLensRecommender:
                 " [TWO-WHEELER ROAD SAFETY: Mandatory shatter-resistant 1.60 high-impact material "
                 "and dust-repellent oleophobic coating for bike/scooter riding.]"
             )
+        elif gender == "female" and (is_presbyope or is_heavy_screen):
+            rec_index = "1.60 High Index (Cosmetic Edge Thinning for Feminine Frames)"
         elif is_presbyope and is_heavy_screen:
             rec_index = "1.60 High Index (Thin & Lightweight)"
         elif is_outdoor_heavy:
             rec_index = "1.60 Impact-Resistant (Extra Durability)"
         else:
             rec_index = "1.56 / 1.60 Clarity Index"
+
+        # Factor in Ocular Surface Dryness
+        if dryness_status == "fluctuating_blur_burning":
+            triggers.append("Ocular surface burning and fluctuating tear-film blur")
+            dispensing_notes += (
+                " [TEAR-FILM DRY EYE WARNING: Patient reports fluctuating blur and ocular burning. "
+                "Evaluate Tear Break-Up Time (TBUT) before finalizing reading add to prevent premature over-plus dispensing.]"
+            )
+            if "Platinum" not in coating:
+                coating = "ZEISS DuraVision Platinum UV (Ultra-Slick Oleophobic + Blue-Light Protection)"
 
         # 5. Factor in On-Screen Test Results if available
         if onscreen_test_results:
@@ -168,6 +185,11 @@ class ZeissLensRecommender:
             duochrome = onscreen_test_results.get("duochrome", {})
             if duochrome.get("tendency"):
                 dispensing_notes += f" [DUOCHROME PRE-REFRACTION: {duochrome.get('tendency')}]."
+                if gender == "male" and duochrome.get("status") == "needs_clinical_attention":
+                    dispensing_notes += (
+                        " [MALE COLOUR VIGILANCE: Red-green Duochrome imbalance noted. "
+                        "Check for X-linked congenital deuteranomaly/protanomaly (~8% prevalence) during trial lens refraction.]"
+                    )
 
         # 6. Progressive Adaptation & Non-Tolerance Risk Calculation
         adaptation_score = 0

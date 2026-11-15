@@ -170,3 +170,33 @@ def test_ergonomic_distance_short_corridor_mapping():
 
     assert "Short Corridor 14mm" in rec.corridor_or_boost
 
+
+def test_gender_female_presbyope_fits_14mm_short_corridor_and_thinning():
+    prof = create_base_profile(age=47, near="significant_blur_holds_far")
+    prof.patient_gender = "female"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "Short Corridor 14mm" in rec.corridor_or_boost
+    assert "Cosmetic Edge Thinning" in rec.recommended_index
+
+
+def test_ocular_surface_dryness_triggers_tbut_warning_and_platinum():
+    prof = create_base_profile(age=45, near="significant_blur_holds_far")
+    prof.near_vision_status["ocular_surface_dryness"] = "fluctuating_blur_burning"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "TEAR-FILM DRY EYE WARNING" in rec.optician_dispensing_notes
+    assert "Evaluate Tear Break-Up Time" in rec.optician_dispensing_notes
+    assert "Platinum" in rec.recommended_coating
+
+
+def test_gender_male_duochrome_color_deficiency_alert():
+    prof = create_base_profile(age=30)
+    prof.patient_gender = "male"
+    screening = {"duochrome": {"status": "needs_clinical_attention", "tendency": "red_clearer"}}
+    rec = ZeissLensRecommender.recommend(prof, screening)
+
+    assert "MALE COLOUR VIGILANCE" in rec.optician_dispensing_notes
+    assert "deuteranomaly" in rec.optician_dispensing_notes
+
+

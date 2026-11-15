@@ -44,9 +44,11 @@ def build_functional_profile(
 
     near_reading = answers.get("q_near_mobile_reading")
     fine_fatigue = answers.get("q_fine_task_fatigue")
+    dryness_q = answers.get("q_ocular_surface_dryness")
     near_status = {
         "mobile_reading_status": near_reading.selected_option if near_reading else "unassessed",
         "fine_task_fatigue": fine_fatigue.selected_option if fine_fatigue else "unassessed",
+        "ocular_surface_dryness": dryness_q.selected_option if dryness_q else "unassessed",
         "has_presbyopic_indicators": (
             near_reading.selected_option in ["significant_blur_holds_far", "cannot_read_near"]
             if near_reading else False

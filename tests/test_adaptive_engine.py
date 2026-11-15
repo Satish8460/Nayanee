@@ -133,3 +133,25 @@ def test_chief_complaint_and_red_flag_dominate_age_prior():
     # Near gain (boosted 1.3x by chief complaint) exceeds distance gain
     assert gain_near > gain_dist
 
+
+def test_gender_prior_boosts_dryness_and_near_for_female_presbyope():
+    engine_female_presb = AdaptiveAnamnesisEngine(session_id="test_female_presb", patient_age=46, patient_gender="female")
+    engine_baseline_presb = AdaptiveAnamnesisEngine(session_id="test_base_presb", patient_age=46, patient_gender=None)
+
+    q_dryness = next(q for q in QUESTIONS if q.id == "q_ocular_surface_dryness")
+    gain_female = engine_female_presb.calculate_information_gain(q_dryness)
+    gain_baseline = engine_baseline_presb.calculate_information_gain(q_dryness)
+
+    assert gain_female == pytest.approx(gain_baseline * 1.25)
+
+
+def test_gender_none_or_other_strictly_neutral():
+    engine_none = AdaptiveAnamnesisEngine(session_id="test_g_none", patient_gender=None)
+    engine_other = AdaptiveAnamnesisEngine(session_id="test_g_other", patient_gender="other")
+
+    for q in QUESTIONS:
+        gain_none = engine_none.calculate_information_gain(q)
+        gain_other = engine_other.calculate_information_gain(q)
+        assert gain_none == pytest.approx(gain_other)
+
+

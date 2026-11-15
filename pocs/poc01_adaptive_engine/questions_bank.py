@@ -341,6 +341,54 @@ QUESTIONS: List[Question] = [
         base_information_weight=0.75,
     ),
     Question(
+        id="q_ocular_surface_dryness",
+        category=QuestionCategory.NEAR_VISION,
+        domain=FunctionalDomain.NEAR,
+        text_en="Do your eyes feel dry, burning, or gritty, or does your reading vision fluctuate and clear up after blinking?",
+        text_translations={
+            "kn": "ನಿಮ್ಮ ಕಣ್ಣುಗಳಲ್ಲಿ ಶುಷ್ಕತೆ, ಉರಿ ಅಥವಾ ಮರಳಿನಂತ ಅನುಭವವಾಗುತ್ತದೆಯೇ, ಅಥವಾ ಕಣ್ಣು ಮಿಟುಕಿಸಿದ ನಂತರ ಅಸ್ಪಷ್ಟ ದೃಷ್ಟಿ ತಾತ್ಕಾಲಿಕವಾಗಿ ಸರಿಯಾಗುತ್ತದೆಯೇ?",
+            "hi": "क्या आपकी आँखों में सूखापन, जलन या चुभन महसूस होती है, या पलकें झपकाने के बाद धुंधलापन थोड़ी देर के लिए ठीक हो जाता है?",
+            "ta": "உங்கள் கண்களில் வறட்சி, எரிச்சல் அல்லது மணல் போன்ற உணர்வு ஏற்படுகிறதா, அல்லது கண் சிமிட்டிய பிறகு மங்கலான பார்வை தற்காலிகமாக தெளிவாகிறதா?",
+            "te": "మీ కళ్లలో పొడిబారడం, మంట లేదా నలక ఉన్నట్లు అనిపిస్తోందా, లేదా రెప్పలు వేసిన తర్వాత అస్పష్టత తాత్కాలికంగా తగ్గి స్పష్టంగా కనిపిస్తోందా?",
+            "ml": "നിങ്ങളുടെ കണ്ണുകളിൽ വരൾച്ചയോ, എരിച്ചിലോ, മണൽ തരികൾ ഉള്ളതുപോലെയോ തോന്നാറുണ്ടോ, അതോ കണ്ണ് ചിമ്മിയ ശേഷം മങ്ങൽ താൽക്കാലികമായി മാറാറുണ്ടോ?",
+            "en": "Do your eyes feel dry, burning, or gritty, or does your reading vision fluctuate and clear up after blinking?",
+        },
+        options=["no_dryness_stable", "mild_dryness_screen", "fluctuating_blur_burning"],
+        options_translations={
+            "kn": {
+                "no_dryness_stable": "ಉರಿ ಅಥವಾ ಶುಷ್ಕತೆ ಇಲ್ಲ; ದೃಷ್ಟಿ ಸ್ಥಿರವಾಗಿದೆ",
+                "mild_dryness_screen": "ಹೆಚ್ಚು ಸಮಯ ಪರದೆ/ಮೊಬೈಲ್ ಬಳಸಿದಾಗ ಮಾತ್ರ ಸಾಧಾರಣ ಶುಷ್ಕತೆ",
+                "fluctuating_blur_burning": "ಕಣ್ಣು ಉರಿ / ಚುಚ್ಚುವಿಕೆ ಇದೆ; ಕಣ್ಣು ಮಿಟುಕಿಸಿದರೆ ಮಾತ್ರ ಸ್ವಲ್ಪ ಸ್ಪಷ್ಟವಾಗುತ್ತದೆ",
+            },
+            "hi": {
+                "no_dryness_stable": "कोई जलन या सूखापन नहीं; नजर स्थिर है",
+                "mild_dryness_screen": "लंबे समय तक स्क्रीन देखने पर ही हल्का सूखापन",
+                "fluctuating_blur_burning": "अक्सर जलन व चुभन; पलक झपकाने पर ही थोड़ी देर साफ दिखता है",
+            },
+            "ta": {
+                "no_dryness_stable": "எரிச்சல் அல்லது வறட்சி இல்லை; பார்வை நிலையானது",
+                "mild_dryness_screen": "நீண்ட நேரம் திரை பயன்படுத்தும்போது மட்டும் லேசான வறட்சி",
+                "fluctuating_blur_burning": "அடிக்கடி கண் எரிச்சல்; கண் சிமிட்டினால் மட்டுமே தற்காலிக தெளிவு",
+            },
+            "te": {
+                "no_dryness_stable": "మంట లేదా పొడిబారడం లేదు; చూపు స్థిరంగా ఉంది",
+                "mild_dryness_screen": "ఎక్కువ సమయం స్క్రీన్ చూసినప్పుడు మాత్రమే స్వల్ప పొడిబారడం",
+                "fluctuating_blur_burning": "తరచుగా కళ్ల మంట; రెప్పలు వేస్తేనే కాసేపు స్పష్టంగా కనిపిస్తుంది",
+            },
+            "ml": {
+                "no_dryness_stable": "എരിച്ചിലോ വരൾച്ചയോ ഇല്ല; കാഴ്ച സ്ഥിരമാണ്",
+                "mild_dryness_screen": "കൂടുതൽ സമയം സ്ക്രീൻ ഉപയോഗിക്കുമ്പോൾ മാത്രം നേരിയ വരൾച്ച",
+                "fluctuating_blur_burning": "ഇടയ്ക്കിടെ കണ്ണ് എരിച്ചിൽ; കണ്ണ് ചിമ്മിയാൽ മാത്രമേ താൽക്കാലികമായി തെളിയൂ",
+            },
+            "en": {
+                "no_dryness_stable": "No dryness or burning; vision is clear and stable",
+                "mild_dryness_screen": "Mild dryness only during long computer or mobile use",
+                "fluctuating_blur_burning": "Frequent burning or gritty feeling; vision fluctuates and clears with blinking",
+            },
+        },
+        base_information_weight=0.70,
+    ),
+    Question(
         id="q_intermediate_screen",
         category=QuestionCategory.INTERMEDIATE_VISION,
         domain=FunctionalDomain.INTERMEDIATE,
