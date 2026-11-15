@@ -120,7 +120,24 @@ class AdaptiveAnamnesisEngine:
         if question.is_red_flag_probe and "q_acute_symptoms" not in self.answers:
             return 2.5
 
-        return question.base_information_weight * domain_unc * chief_boost
+        # Non-brittle physiological age prior modulation
+        age_boost = 1.0
+        if self.patient_age is not None:
+            if self.patient_age >= 60:
+                if question.domain in (FunctionalDomain.NEAR, FunctionalDomain.DISTANCE):
+                    age_boost = 1.25
+                elif question.domain == FunctionalDomain.INTERMEDIATE:
+                    age_boost = 1.15
+            elif self.patient_age >= 40:
+                if question.domain == FunctionalDomain.NEAR:
+                    age_boost = 1.25
+                elif question.domain == FunctionalDomain.INTERMEDIATE and self.patient_age >= 45:
+                    age_boost = 1.15
+            elif self.patient_age < 35:
+                if question.domain == FunctionalDomain.LIFESTYLE:
+                    age_boost = 1.20
+
+        return question.base_information_weight * domain_unc * chief_boost * age_boost
 
     def check_contradictions(self, new_record: AnswerRecord) -> None:
         for rule in CONTRADICTION_RULES:
