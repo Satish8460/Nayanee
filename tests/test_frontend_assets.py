@@ -83,9 +83,9 @@ def test_zeiss_visual_simulator_and_visuconsult_bridge_in_frontend():
     assert "onSimSliderChange" in html
     assert "renderSimVisual" in html
 
-    # VISUCONSULT 500 QR and WhatsApp pass
+    # VISUCONSULT 500 QR and printable slip pass
     assert "visuconsult-qr" in html
-    assert "openWhatsAppPass" in html
+    assert "printable-slip" in html
     assert "ZEISS VISUCONSULT 500" in html
 
 
