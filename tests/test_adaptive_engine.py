@@ -155,3 +155,47 @@ def test_gender_none_or_other_strictly_neutral():
         assert gain_none == pytest.approx(gain_other)
 
 
+def test_contact_lens_routine_prerequisite_gating():
+    engine = AdaptiveAnamnesisEngine(session_id="test_cl_prereq")
+    q_cl = next(q for q in QUESTIONS if q.id == "q_contact_lens_routine")
+
+    # Before answering q_current_eyewear, prerequisite is NOT satisfied
+    assert engine.is_prerequisite_satisfied(q_cl) is False
+
+    # If patient answers never_worn, prerequisite is NOT satisfied
+    q_cur = next(q for q in QUESTIONS if q.id == "q_current_eyewear")
+    engine.record_answer(q_cur, "never_worn")
+    assert engine.is_prerequisite_satisfied(q_cl) is False
+
+    # If patient answers contact_lenses_only, prerequisite IS satisfied
+    engine2 = AdaptiveAnamnesisEngine(session_id="test_cl_prereq2")
+    engine2.record_answer(q_cur, "contact_lenses_only")
+    assert engine2.is_prerequisite_satisfied(q_cl) is True
+
+    # If patient answers both_glasses_and_contacts, prerequisite IS satisfied
+    engine3 = AdaptiveAnamnesisEngine(session_id="test_cl_prereq3")
+    engine3.record_answer(q_cur, "both_glasses_and_contacts")
+    assert engine3.is_prerequisite_satisfied(q_cl) is True
+
+
+def test_contact_lens_contradiction_detection():
+    engine = AdaptiveAnamnesisEngine(session_id="test_cl_contra")
+    q_cur = next(q for q in QUESTIONS if q.id == "q_current_eyewear")
+    q_cl = next(q for q in QUESTIONS if q.id == "q_contact_lens_routine")
+
+    engine.record_answer(q_cur, "never_worn")
+    engine.record_answer(q_cl, "evening_dryness_gritty")
+
+    assert len(engine.contradictions) >= 1
+    assert any("never wearing corrective lenses" in c.explanation for c in engine.contradictions)
+
+
+def test_sports_physical_activity_available_in_question_bank():
+    q_sports = next(q for q in QUESTIONS if q.id == "q_sports_physical_activity")
+    assert q_sports.domain.value == "lifestyle"
+    assert "ball_racket_sports" in q_sports.options
+    assert "cycling_running_outdoor" in q_sports.options
+    assert "swimming_water_sports" in q_sports.options
+
+
+

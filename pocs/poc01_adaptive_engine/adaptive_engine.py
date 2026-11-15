@@ -43,6 +43,14 @@ CONTRADICTION_RULES = [
         "explanation": "Reported never wearing glasses, but answered having glasses for more than two years.",
         "severity": SeverityLevel.HIGH,
     },
+    {
+        "q_a": "q_current_eyewear",
+        "val_a": "never_worn",
+        "q_b": "q_contact_lens_routine",
+        "val_b": "evening_dryness_gritty",
+        "explanation": "Reported never wearing corrective lenses, but reported contact lens wear with evening dryness.",
+        "severity": SeverityLevel.HIGH,
+    },
 ]
 
 

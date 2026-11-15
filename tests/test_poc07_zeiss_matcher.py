@@ -200,3 +200,42 @@ def test_gender_male_duochrome_color_deficiency_alert():
     assert "deuteranomaly" in rec.optician_dispensing_notes
 
 
+def test_sports_ball_racket_triggers_shatterproof_polycarbonate():
+    prof = create_base_profile(age=25)
+    prof.lifestyle_occupational_context["sports_physical_activity"] = "ball_racket_sports"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "1.59 Shatterproof Polycarbonate" in rec.recommended_index
+    assert "ANSI Z87.1" in rec.recommended_index
+    assert "SPORTS IMPACT SAFETY" in rec.optician_dispensing_notes
+
+
+def test_sports_water_activity_triggers_skypol_polarized():
+    prof = create_base_profile(age=32)
+    prof.lifestyle_occupational_context["sports_physical_activity"] = "swimming_water_sports"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "SkyPol Polarized" in rec.recommended_coating
+    assert any("Water sports" in t for t in rec.lifestyle_triggers)
+
+
+def test_sports_cycling_triggers_photofusion_and_wrap_bevel():
+    prof = create_base_profile(age=29)
+    prof.lifestyle_occupational_context["sports_physical_activity"] = "cycling_running_outdoor"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "PhotoFusion X" in rec.recommended_coating
+    assert "CYCLING/SPORTS WRAP" in rec.optician_dispensing_notes
+    assert "Base Curve 6-8" in rec.recommended_index or "Curved Sport Bevel" in rec.recommended_index
+
+
+def test_contact_lens_dryness_triggers_wearer_backup_notes():
+    prof = create_base_profile(age=27)
+    prof.eyewear_history["contact_lens_routine"] = "evening_dryness_gritty"
+    rec = ZeissLensRecommender.recommend(prof)
+
+    assert "CONTACT LENS WEARER BACKUP" in rec.optician_dispensing_notes
+    assert any("Contact lens wear fatigue" in t for t in rec.lifestyle_triggers)
+
+
+

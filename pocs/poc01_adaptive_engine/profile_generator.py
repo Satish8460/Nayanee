@@ -57,19 +57,23 @@ def build_functional_profile(
 
     screen_time = answers.get("q_intermediate_screen")
     outdoor_exp = answers.get("q_outdoor_exposure")
+    sports_q = answers.get("q_sports_physical_activity")
     lifestyle_status = {
         "daily_screen_hours": screen_time.selected_option if screen_time else "unassessed",
         "outdoor_sun_exposure": outdoor_exp.selected_option if outdoor_exp else "unassessed",
+        "sports_physical_activity": sports_q.selected_option if sports_q else "no_intense_sports",
         "digital_visual_fatigue_risk": screen_time.selected_option in ["five_to_eight", "more_than_eight"] if screen_time else False,
     }
 
     eyewear_cur = answers.get("q_current_eyewear")
     eyewear_age = answers.get("q_glasses_age")
     eyewear_sat = answers.get("q_glasses_satisfaction")
+    cl_routine = answers.get("q_contact_lens_routine")
     eyewear_status = {
         "current_modality": eyewear_cur.selected_option if eyewear_cur else "never_worn",
         "glasses_age": eyewear_age.selected_option if eyewear_age else "n/a",
         "satisfaction_level": eyewear_sat.selected_option if eyewear_sat else "n/a",
+        "contact_lens_routine": cl_routine.selected_option if cl_routine else "unassessed",
     }
 
     ergo_q = answers.get("q_ergonomic_working_distance")

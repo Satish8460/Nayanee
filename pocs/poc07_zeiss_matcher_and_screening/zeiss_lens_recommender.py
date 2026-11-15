@@ -42,6 +42,8 @@ class ZeissLensRecommender:
         dist_clarity = profile.distance_vision_status.get("distance_clarity_status", "")
         ergo_plane = profile.ergonomic_task_profile.get("primary_focal_plane", "")
         commute_mode = profile.transit_environmental_vector.get("commute_mode", "")
+        cl_status = profile.eyewear_history.get("contact_lens_routine", "")
+        sports_activity = profile.lifestyle_occupational_context.get("sports_physical_activity", "")
         gender = (profile.patient_gender or "").lower().strip()
 
         is_presbyope = (
@@ -52,6 +54,10 @@ class ZeissLensRecommender:
         is_night_glare = glare_difficulty in ["moderate_glare", "severe_glare_avoids_driving"]
         is_outdoor_heavy = outdoor_sun in ["majority_outdoors_heavy_sun", "one_to_three_hours_outdoors"]
         is_two_wheeler = commute_mode == "two_wheeler_bike"
+        is_ball_racket_sports = sports_activity == "ball_racket_sports"
+        is_cycling_outdoor = sports_activity == "cycling_running_outdoor"
+        is_water_sports = sports_activity == "swimming_water_sports"
+        has_cl_dryness = cl_status in ["evening_dryness_gritty", "frequent_redness_discomfort"]
 
         # Track triggers
         if is_presbyope:
@@ -64,6 +70,14 @@ class ZeissLensRecommender:
             triggers.append(f"Active outdoor UV and bright sunlight exposure")
         if is_two_wheeler:
             triggers.append("Daily two-wheeler commuter exposed to open wind, dust, and oncoming LED headlights")
+        if is_ball_racket_sports:
+            triggers.append("High-velocity ball/racket sports participant - ocular impact safety mandate")
+        if is_cycling_outdoor:
+            triggers.append("Dynamic cycling/running sports - wind, dust, and rapid illumination variation")
+        if is_water_sports:
+            triggers.append("Water sports/marine surface activity - high horizontal polarized glare")
+        if has_cl_dryness:
+            triggers.append("Contact lens wear fatigue with evening dryness/irritation (CLIDE risk)")
 
         # 2. Determine Primary Lens & Family & Corridor
         if is_presbyope:
@@ -136,10 +150,14 @@ class ZeissLensRecommender:
             )
 
         # 3. Determine Recommended Coating
-        if is_two_wheeler and is_night_glare:
+        if is_water_sports:
+            coating = "ZEISS SkyPol Polarized + DuraVision Sun (Eliminates Water Surface Glare)"
+        elif is_two_wheeler and is_night_glare:
             coating = "ZEISS DuraVision DriveSafe + Platinum (Dust & High-Beam Glare Shield)"
         elif is_night_glare:
             coating = "ZEISS DuraVision DriveSafe"
+        elif is_cycling_outdoor:
+            coating = "ZEISS PhotoFusion X (Fast Variable Tint) + DuraVision Platinum"
         elif is_heavy_screen:
             coating = "ZEISS DuraVision BlueProtect (400–455nm Selective Filter)"
         elif is_outdoor_heavy:
@@ -148,7 +166,19 @@ class ZeissLensRecommender:
             coating = "ZEISS DuraVision Platinum UV (Ultra-Hard Scratch Resistance + Anti-Static)"
 
         # 4. Determine Recommended Index & Material
-        if is_two_wheeler:
+        if is_ball_racket_sports:
+            rec_index = "1.59 Shatterproof Polycarbonate / 1.53 Trivex (ANSI Z87.1 Impact Safety)"
+            dispensing_notes += (
+                " [SPORTS IMPACT SAFETY: Mandatory 1.59 Polycarbonate or 1.53 Trivex impact-resistant material "
+                "for racquet/ball sports to prevent ocular trauma and globe rupture.]"
+            )
+        elif is_cycling_outdoor:
+            rec_index = "1.60 Impact-Resistant (Extra Durability & Curved Sport Bevel)"
+            dispensing_notes += (
+                " [CYCLING/SPORTS WRAP: Fit ZEISS Sport base-curve 6-8 wrap lens with compensated "
+                "prescription optics for lateral wind and debris protection.]"
+            )
+        elif is_two_wheeler:
             rec_index = "1.60 High-Impact Polycarbonate / Trivex (Road Safety)"
             dispensing_notes += (
                 " [TWO-WHEELER ROAD SAFETY: Mandatory shatter-resistant 1.60 high-impact material "
@@ -162,6 +192,19 @@ class ZeissLensRecommender:
             rec_index = "1.60 Impact-Resistant (Extra Durability)"
         else:
             rec_index = "1.56 / 1.60 Clarity Index"
+
+        # Factor in Contact Lens Routine & Evening Dryness
+        if has_cl_dryness:
+            dispensing_notes += (
+                " [CONTACT LENS WEARER BACKUP: Patient experiences evening CL dry-eye fatigue. "
+                "Dispense ZEISS EnergizeMe / BlueProtect spectacles for evening screen recovery; schedule TBUT & corneal assessment.]"
+            )
+
+        # Factor in OfficeLens M.I.D. Depth
+        if ergo_plane == "desktop_monitor_desk" and is_presbyope:
+            dispensing_notes += " [OFFICE ERGONOMICS: Optimal for ZEISS OfficeLens Desk (M.I.D. 200cm depth of focus for desktop + keyboard).]"
+        elif ergo_plane == "balanced_multi_distance" and is_presbyope:
+            dispensing_notes += " [OFFICE ERGONOMICS: Optimal for ZEISS OfficeLens Room (M.I.D. 400cm depth of focus for desk + conference interaction).]"
 
         # Factor in Ocular Surface Dryness
         if dryness_status == "fluctuating_blur_burning":
