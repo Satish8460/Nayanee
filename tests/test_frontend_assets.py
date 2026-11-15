@@ -76,6 +76,10 @@ def test_zeiss_visual_simulator_and_visuconsult_bridge_in_frontend():
     # Visual simulator canvas and controls
     assert "simVisualCanvas" in html
     assert "setSimMode" in html
+    assert "autoSelectSimMode" in html
+    assert "simPersonalizedBanner" in html
+    assert 'data-mode="progressive"' in html
+    assert 'data-mode="drivesafe"' in html
     assert "onSimSliderChange" in html
     assert "renderSimVisual" in html
 
