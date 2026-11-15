@@ -1,7 +1,7 @@
 """Adaptive Anamnesis Decision Engine.
 """
 
-from typing import List, Dict, Optional, Callable
+from typing import List, Dict, Optional, Callable, Any
 from .models import (
     Question,
     QuestionCategory,
@@ -80,6 +80,20 @@ class AdaptiveAnamnesisEngine:
             FunctionalDomain.EYEWEAR: 1.0,
             FunctionalDomain.RED_FLAG: 1.0,
         }
+        self.onscreen_screening_results: Dict[str, Any] = {}
+
+    def record_screening_result(self, test_type: str, result: Dict[str, Any]):
+        self.onscreen_screening_results[test_type] = result
+        if result.get("is_emergency_flag"):
+            self.red_flags.append(
+                RedFlagAlert(
+                    symptom=f"Screening Alert: {result.get('test_name', test_type)}",
+                    trigger_question_id=f"screening_{test_type}",
+                    trigger_answer=result.get("finding", "Abnormal result"),
+                    urgency=SeverityLevel.CRITICAL,
+                    clinical_note=result.get("clinical_notes_for_optometrist", "Emergency referral triggered by on-screen test."),
+                )
+            )
 
     def is_prerequisite_satisfied(self, question: Question) -> bool:
         if not question.prerequisites:

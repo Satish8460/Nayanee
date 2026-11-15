@@ -46,6 +46,47 @@ def export_printable_slip(profile_id: str):
         raise HTTPException(status_code=404, detail="Profile not found.")
 
     guidance = OpticalLifestyleAdvisor.generate_recommendations(prof)
+    zeiss_rec = getattr(prof, "zeiss_recommendation", None) or {}
+    screening_res = getattr(prof, "onscreen_screening_results", None) or {}
+
+    zeiss_block = ""
+    if zeiss_rec:
+        zeiss_block = f"""
+  <div class="section" style="border: 1.5px solid #0052cc; border-radius: 6px; padding: 10px 14px; background: #f0f7ff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <span style="font-size: 0.95rem; font-weight: bold; color: #002b66; text-transform: uppercase;">
+        💎 Recommended ZEISS Ophthalmic Lens Solution
+      </span>
+      <span style="background: #0052cc; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+        ZEISS Portfolio
+      </span>
+    </div>
+    <div style="font-size: 0.9rem; line-height: 1.5; color: #172b4d;">
+      <div><strong>Primary Lens:</strong> <span style="color: #0052cc; font-weight: bold;">{zeiss_rec.get('primary_lens', 'N/A')}</span> ({zeiss_rec.get('lens_family', '')})</div>
+      <div><strong>Recommended Coating:</strong> {zeiss_rec.get('recommended_coating', 'N/A')}</div>
+      <div><strong>Index / Corridor:</strong> {zeiss_rec.get('recommended_index', '1.56')} &bull; {zeiss_rec.get('corridor_or_boost', 'Standard')}</div>
+      <div style="margin-top: 4px; font-size: 0.82rem; color: #42526e;"><em>{zeiss_rec.get('patient_explanation', '')}</em></div>
+      <div style="margin-top: 4px; font-size: 0.82rem; color: #0049b0; background: #deebff; padding: 4px 8px; border-radius: 4px;">
+        <strong>Optician Dispensing:</strong> {zeiss_rec.get('optician_dispensing_notes', '')}
+      </div>
+    </div>
+  </div>
+"""
+
+    screening_block = ""
+    if screening_res:
+        screening_rows = "".join(
+            f"<div><strong>• {k.replace('_', ' ').title()}:</strong> {v.get('finding', 'Completed')} <span style='color: {'#de350b' if v.get('is_emergency_flag') else '#006644'}; font-weight: 600;'>[{v.get('status', 'ok').upper()}]</span></div>"
+            for k, v in screening_res.items()
+        )
+        screening_block = f"""
+  <div class="section">
+    <div class="section-title">On-Screen Functional Screening Findings</div>
+    <div style="font-size: 0.85rem; background: #fafbfc; border: 1px solid #dfe1e6; padding: 8px 12px; border-radius: 4px;">
+      {screening_rows}
+    </div>
+  </div>
+"""
 
     is_urgent = len(prof.red_flags) > 0
     status_color = "#de350b" if is_urgent else "#0052cc"
@@ -160,6 +201,10 @@ def export_printable_slip(profile_id: str):
       {''.join(f"<div><strong>• [{g['category']}]</strong> {g['consideration']}</div>" for g in guidance) if guidance else '<div>Standard subjective refraction indicated.</div>'}
     </div>
   </div>
+
+  {zeiss_block}
+
+  {screening_block}
 
   <div class="opto-action">
     <div style="font-weight: bold; margin-bottom: 6px; color: #002b66;">Optometrist Refraction & Clinical Notes</div>

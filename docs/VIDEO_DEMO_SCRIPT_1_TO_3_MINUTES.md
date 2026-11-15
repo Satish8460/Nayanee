@@ -42,7 +42,7 @@
   > *"Unlike rigid questionnaires, Nayanee's Information-Entropy engine calculates the most informative question next, automatically skipping irrelevant queries and pruning consultation time by over 25%. Our direct microphone audio pipeline records 16kHz PCM audio and analyzes it with our zero-GPU Clinical SLU engine, matching intent with 95% confidence without expensive cloud hardware."*
 
 ---
-
+ 
 ### [1:25 – 1:55] Optometrist Triage & Optical Lifestyle Guidance (POC-05)
 - **Visual:** Interview concludes. Summary card appears: `✅ Functional Vision Profile Created for Parvathamma B.`.
 - **Screen Action:** Click `🔍 View in Optometrist Portal`.
@@ -58,4 +58,4 @@
 - **Visual:** Click `🖨️ Print Consultation Slip`. A clean, printable consultation slip opens in a new tab.
 - **Screen Action:** Scroll down to show the patient demographics, reported functional demands, acute triage clearance, and optometrist sign-off block.
 - **Voiceover:**
-  > *"With one tap, store staff can print an official consultation slip for subjective refraction. Nayanee requires zero specialized hardware, runs entirely on CPU, passes 39 automated tests, and turns any ordinary smartphone into an accessible vision intelligence terminal. Thank you."*
+  > *"With one tap, store staff can print an official consultation slip for subjective refraction. Nayanee requires zero specialized hardware, runs entirely on CPU, passes 50 automated tests, and turns any ordinary smartphone into an accessible vision intelligence terminal. Thank you."*

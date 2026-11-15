@@ -231,3 +231,98 @@ def test_transcribe_endpoint_validation():
     )
     assert short_resp.status_code == 200
     assert short_resp.json()["status"] == "no_speech"
+
+
+def test_onscreen_screening_and_zeiss_slip_integration():
+    # 1. Start a patient session
+    start_resp = client.post(
+        "/api/v1/session/start",
+        json={
+            "language": "kn",
+            "patient_name": "Ramesh Rao",
+            "patient_age": 49,
+            "patient_gender": "Male",
+        },
+    )
+    assert start_resp.status_code == 201
+    session_id = start_resp.json()["session_id"]
+
+    # 2. Submit on-screen tests
+    duo_resp = client.post(
+        f"/api/v1/session/{session_id}/screening/duochrome",
+        json={"selection": "red_clearer"},
+    )
+    assert duo_resp.status_code == 200
+    assert "RED" in duo_resp.json()["finding"]
+    assert duo_resp.json()["is_emergency_flag"] is False
+
+    astig_resp = client.post(
+        f"/api/v1/session/{session_id}/screening/astigmatic_dial",
+        json={"selection": "12_to_6"},
+    )
+    assert astig_resp.status_code == 200
+    assert "Vertical" in astig_resp.json()["finding"]
+
+    amsler_resp = client.post(
+        f"/api/v1/session/{session_id}/screening/amsler_grid",
+        json={"selection": "all_lines_straight"},
+    )
+    assert amsler_resp.status_code == 200
+    assert amsler_resp.json()["is_emergency_flag"] is False
+
+    # 3. Complete interview adaptively
+    curr_data = start_resp.json()
+    turns = 0
+    while curr_data["status"] == "in_progress" and turns < 10:
+        turns += 1
+        q = curr_data["current_question"]
+        choice = q["options"][0]
+        if q["id"] == "q_near_mobile_reading":
+            choice = "significant_blur_holds_far"
+        elif q["id"] == "q_intermediate_screen":
+            choice = "more_than_eight"
+        resp = client.post(
+            f"/api/v1/session/{session_id}/turn",
+            json={"question_id": q["id"], "selected_option": choice},
+        )
+        curr_data = resp.json()
+
+    assert curr_data["status"] in ["completed", "urgent_escalation"]
+    profile_id = curr_data["profile_id"]
+    prof_resp = client.get(f"/api/v1/profiles/{profile_id}")
+    assert prof_resp.status_code == 200
+    prof_data = prof_resp.json()["profile"]
+
+    # Verify ZEISS recommendation is attached
+    assert "zeiss_recommendation" in prof_data
+    zeiss_rec = prof_data["zeiss_recommendation"]
+    assert "SmartLife" in zeiss_rec["primary_lens"] or "Progressive" in zeiss_rec["primary_lens"]
+    assert "BlueProtect" in zeiss_rec["recommended_coating"]
+
+    # Verify on-screen screening results are attached
+    assert "onscreen_screening_results" in prof_data
+    assert "duochrome" in prof_data["onscreen_screening_results"]
+    assert "astigmatic_dial" in prof_data["onscreen_screening_results"]
+
+    # Verify Printable Slip includes ZEISS branding and product
+    slip_resp = client.get(f"/api/v1/export/profile/{profile_id}/printable-slip")
+    assert slip_resp.status_code == 200
+    assert "Recommended ZEISS Ophthalmic Lens Solution" in slip_resp.text
+    assert "ZEISS" in slip_resp.text
+    assert "On-Screen Functional Screening Findings" in slip_resp.text
+
+
+def test_amsler_grid_emergency_escalation_flow():
+    start_resp = client.post("/api/v1/session/start", json={"language": "en"})
+    session_id = start_resp.json()["session_id"]
+
+    # Critical Amsler distortion
+    amsler_resp = client.post(
+        f"/api/v1/session/{session_id}/screening/amsler_grid",
+        json={"selection": "wavy_distorted_lines"},
+    )
+    assert amsler_resp.status_code == 200
+    data = amsler_resp.json()
+    assert data["is_emergency_flag"] is True
+    assert data["status"] == "urgent_referral"
+    assert data["review_status"] == "urgent_medical_escalation"

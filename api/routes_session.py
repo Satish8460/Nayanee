@@ -240,6 +240,7 @@ def submit_turn(session_id: str, req: SubmitTurnRequest):
         patient_age=getattr(engine, "patient_age", None),
         patient_gender=getattr(engine, "patient_gender", None),
         patient_phone=getattr(engine, "patient_phone", None),
+        onscreen_screening_results=getattr(engine, "onscreen_screening_results", {}),
     )
     store.save_profile(profile)
 
@@ -407,3 +408,78 @@ def transcribe_recorded_audio(req: TranscribeAudioRequest):
         return {"transcript": "", "status": "network_error", "detail": str(exc)}
     except Exception as exc:
         return {"transcript": "", "status": "error", "detail": str(exc)}
+
+
+class SubmitScreeningRequest(BaseModel):
+    selection: str
+
+
+class ScreeningResponse(BaseModel):
+    session_id: str
+    test_type: str
+    status: str
+    finding: str
+    clinical_notes: str
+    is_emergency_flag: bool
+    review_status: str
+
+
+@router.post("/{session_id}/screening/{test_type}", response_model=ScreeningResponse)
+def submit_onscreen_test(session_id: str, test_type: str, req: SubmitScreeningRequest):
+    engine = store.get_engine(session_id)
+    if not engine:
+        raise HTTPException(status_code=404, detail="Session not found.")
+
+    from pocs.poc07_zeiss_matcher_and_screening.onscreen_screening import OnScreenScreeningEngine
+    valid_tests = ["duochrome", "astigmatic_dial", "amsler_grid"]
+    if test_type not in valid_tests:
+        raise HTTPException(status_code=400, detail=f"Invalid test type. Must be one of {valid_tests}")
+
+    if test_type == "duochrome":
+        res = OnScreenScreeningEngine.evaluate_duochrome(req.selection)
+    elif test_type == "astigmatic_dial":
+        res = OnScreenScreeningEngine.evaluate_astigmatic_dial(req.selection)
+    elif test_type == "amsler_grid":
+        res = OnScreenScreeningEngine.evaluate_amsler_grid(req.selection)
+
+    res_dict = {
+        "test_name": res.test_name,
+        "status": res.status,
+        "finding": res.finding,
+        "clinical_notes_for_optometrist": res.clinical_notes_for_optometrist,
+        "is_emergency_flag": res.is_emergency_flag,
+    }
+    engine.record_screening_result(test_type, res_dict)
+
+    existing_prof = store.get_profile_by_session(session_id)
+    if existing_prof:
+        avg_unc = sum(engine.domain_uncertainty.values()) / len(engine.domain_uncertainty)
+        updated_profile = build_functional_profile(
+            session_id=session_id,
+            language=engine.language,
+            answers=engine.answers,
+            turn_history=engine.turn_history,
+            contradictions=engine.contradictions,
+            red_flags=engine.red_flags,
+            uncertainty_score=avg_unc,
+            engine_type="adaptive",
+            patient_name=getattr(engine, "patient_name", "Anonymous Patient"),
+            patient_age=getattr(engine, "patient_age", None),
+            patient_gender=getattr(engine, "patient_gender", None),
+            patient_phone=getattr(engine, "patient_phone", None),
+            onscreen_screening_results=engine.onscreen_screening_results,
+        )
+        store.save_profile(updated_profile)
+        curr_review_status = updated_profile.review_status.value
+    else:
+        curr_review_status = "urgent_medical_escalation" if res.is_emergency_flag else "in_progress"
+
+    return ScreeningResponse(
+        session_id=session_id,
+        test_type=test_type,
+        status=res.status,
+        finding=res.finding,
+        clinical_notes=res.clinical_notes_for_optometrist,
+        is_emergency_flag=res.is_emergency_flag,
+        review_status=curr_review_status,
+    )

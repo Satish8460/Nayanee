@@ -1,7 +1,7 @@
 """Profile Generator for Nayanee Anamnesis Engines.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from .models import (
     FunctionalVisionProfile,
     AnswerRecord,
@@ -25,9 +25,11 @@ def build_functional_profile(
     patient_age: Optional[int] = None,
     patient_gender: Optional[str] = None,
     patient_phone: Optional[str] = None,
+    onscreen_screening_results: Optional[Dict[str, Any]] = None,
 ) -> FunctionalVisionProfile:
     contradictions = contradictions or []
     red_flags = red_flags or []
+    onscreen_screening_results = onscreen_screening_results or {}
 
     dist_clarity = answers.get("q_dist_clarity")
     night_glare = answers.get("q_night_driving_glare")
@@ -77,7 +79,7 @@ def build_functional_profile(
 
     is_sufficient = len(turn_history) >= 5 and "q_chief_complaint" in answers
 
-    return FunctionalVisionProfile(
+    profile = FunctionalVisionProfile(
         session_id=session_id,
         patient_name=patient_name,
         patient_age=patient_age,
@@ -96,4 +98,23 @@ def build_functional_profile(
         is_sufficient_for_review=is_sufficient,
         review_status=status,
         engine_type=engine_type,
+        onscreen_screening_results=onscreen_screening_results,
     )
+
+    try:
+        from pocs.poc07_zeiss_matcher_and_screening.zeiss_lens_recommender import ZeissLensRecommender
+        rec = ZeissLensRecommender.recommend(profile, onscreen_screening_results)
+        profile.zeiss_recommendation = {
+            "primary_lens": rec.primary_lens,
+            "lens_family": rec.lens_family,
+            "recommended_coating": rec.recommended_coating,
+            "recommended_index": rec.recommended_index,
+            "corridor_or_boost": rec.corridor_or_boost,
+            "patient_explanation": rec.patient_explanation,
+            "optician_dispensing_notes": rec.optician_dispensing_notes,
+            "lifestyle_triggers": rec.lifestyle_triggers,
+        }
+    except Exception as exc:
+        profile.zeiss_recommendation = None
+
+    return profile

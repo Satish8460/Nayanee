@@ -116,3 +116,5 @@ class FunctionalVisionProfile(BaseModel):
     is_sufficient_for_review: bool = False
     review_status: ReviewStatus = ReviewStatus.PENDING_OPTOMETRIST_REVIEW
     engine_type: str = "adaptive"
+    onscreen_screening_results: Dict[str, Any] = Field(default_factory=dict)
+    zeiss_recommendation: Optional[Dict[str, Any]] = None
