@@ -3,12 +3,12 @@ for Nayanee — ZEISS Hackathon Final Submission.
 Team: Group Coders | Satish SM, Tejaswini C B | BMSIT
 Themes: Theme 2 (No-Device Vision Intelligence) & Theme 1 (AFI)
 
-Typography and Layout Engineered for Zero Empty Space:
-- Slide Titles: 28-30pt Bold
-- Section/Card Headings: 17pt Bold
-- Bullet Body Content: 13.5-14pt High-Contrast
-- Metric Stat Values: 28pt Bold
-- Metric Stat Labels: 11pt Bold
+LIGHT THEME & EXECUTIVE CLINICAL TYPOGRAPHY SYSTEM:
+- Background: Soft Pristine Slate-White (#F4F6FA)
+- Cards: Pure Crisp White (#FFFFFF) with Elegant Subtle Borders (#CBD5E1)
+- Accents: ZEISS Cobalt (#0052CC), Emerald Clinical (#00875A), Crimson (#DE350B), Amber (#D97706)
+- Typography: Segoe UI, Deep Charcoal (#091E42) for Titles, Slate (#334155) for Body
+- Visual Hierarchy: Generous spacing, filled card proportions, zero empty voids
 """
 
 from pptx import Presentation
@@ -21,31 +21,41 @@ from pptx.enum.shapes import MSO_SHAPE
 def build_final_6_slide_deck(output_paths: list = None):
     if output_paths is None:
         output_paths = [
-            "docs/Nayanee_Final_Presentation_Coders_6_Slides_v2.pptx",
+            "docs/Nayanee_Final_Presentation_Coders_6_Slides_Light.pptx",
             "docs/Nayanee_Final_Presentation_Coders_6_Slides.pptx",
+            "docs/Nayanee_Final_Presentation_Coders_6_Slides_v2.pptx",
         ]
     prs = Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank_layout = prs.slide_layouts[6]
 
-    # Executive High-Contrast Color System
-    BG_DARK = RGBColor(6, 21, 45)          # #06152D (Deep Tech Navy)
-    BG_CARD = RGBColor(14, 38, 77)         # #0E264D (Card Navy)
-    BG_CARD_BORDER = RGBColor(30, 68, 128) # #1E4480
-    ACCENT_CYAN = RGBColor(0, 210, 255)    # #00D2FF (Electric Cyan)
-    ACCENT_BLUE = RGBColor(0, 114, 255)    # #0072FF (ZEISS Cobalt)
-    ACCENT_GREEN = RGBColor(0, 230, 118)   # #00E676 (Emerald Green)
-    ACCENT_RED = RGBColor(255, 82, 82)     # #FF5252 (Warning Crimson)
-    ACCENT_ORANGE = RGBColor(255, 171, 0)  # #FFAB00 (Amber Glare)
-    TEXT_LIGHT = RGBColor(245, 248, 255)   # #F5F8FF (Crisp High-Contrast White)
-    TEXT_MUTED = RGBColor(165, 190, 222)   # #A5BEDE (Bright Readable Light Blue)
-    WHITE = RGBColor(255, 255, 255)
+    # Executive Light Medical/Clinical Palette
+    BG_CANVAS = RGBColor(244, 246, 250)    # #F4F6FA (Crisp executive background)
+    BG_CARD = RGBColor(255, 255, 255)      # #FFFFFF (Pristine White Card)
+    BORDER_DEFAULT = RGBColor(205, 215, 228)# #CDD7E4 (Subtle Card Border)
+
+    # High-Authority Brand & Clinical Accents
+    ZEISS_BLUE = RGBColor(0, 82, 204)      # #0052CC (ZEISS Optical Blue)
+    ZEISS_DARK = RGBColor(9, 30, 66)       # #091E42 (Deep Pitch Charcoal Navy)
+    ACCENT_GREEN = RGBColor(0, 135, 90)    # #00875A (Clinical Health Green)
+    ACCENT_RED = RGBColor(222, 53, 11)     # #DE350B (Triage Alert Crimson)
+    ACCENT_AMBER = RGBColor(217, 119, 6)   # #D97706 (Glare Amber)
+    ACCENT_TEAL = RGBColor(0, 141, 165)    # #008DA5 (Screener Cyan-Teal)
+
+    # Typography Colors
+    TEXT_HEAD = RGBColor(9, 30, 66)        # #091E42 (Sharp Headline Black-Navy)
+    TEXT_TITLE_SUB = RGBColor(0, 82, 204)  # #0052CC (ZEISS Blue Accent)
+    TEXT_BOLD = RGBColor(23, 43, 77)       # #172B4D (Deep Readable Charcoal)
+    TEXT_BODY = RGBColor(71, 85, 105)      # #475569 (Medium Slate Gray)
+    TEXT_MUTED = RGBColor(100, 116, 139)   # #64748B (Muted Metadata)
+    PILL_BG = RGBColor(235, 242, 255)      # #EBF2FF (Soft Ice Blue Pill)
+    PILL_BORDER = RGBColor(179, 212, 255)  # #B3D4FF
 
     def paint_background(slide):
         bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(7.5))
         bg.fill.solid()
-        bg.fill.fore_color.rgb = BG_DARK
+        bg.fill.fore_color.rgb = BG_CANVAS
         bg.line.fill.background()
         return bg
 
@@ -61,46 +71,46 @@ def build_final_6_slide_deck(output_paths: list = None):
             p_sub.text = presenter_sub
         else:
             p_sub.text = "NAYANEE (ನಯनी) • ZEISS HACKATHON FINAL SUBMISSION  |  GROUP CODERS (BMSIT)"
-        p_sub.font.size = Pt(13.0)
+        p_sub.font.size = Pt(12.5)
         p_sub.font.bold = True
-        p_sub.font.color.rgb = ACCENT_CYAN
-        p_sub.space_after = Pt(3)
+        p_sub.font.color.rgb = TEXT_TITLE_SUB
+        p_sub.space_after = Pt(2)
 
         p_title = tf.add_paragraph()
         p_title.text = title_text
-        p_title.font.size = Pt(29)
+        p_title.font.size = Pt(28)
         p_title.font.bold = True
-        p_title.font.color.rgb = WHITE
+        p_title.font.color.rgb = TEXT_HEAD
 
         # Pill Tag (Top Right)
         pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.2), Inches(0.42), Inches(3.45), Inches(0.55))
         pill.fill.solid()
-        pill.fill.fore_color.rgb = BG_CARD
-        pill.line.color.rgb = ACCENT_CYAN
+        pill.fill.fore_color.rgb = PILL_BG
+        pill.line.color.rgb = PILL_BORDER
         pill.line.width = Pt(1.5)
         tf_p = pill.text_frame
         p_p = tf_p.paragraphs[0]
         p_p.text = category_pill
-        p_p.font.size = Pt(13.0)
+        p_p.font.size = Pt(12.5)
         p_p.font.bold = True
-        p_p.font.color.rgb = ACCENT_CYAN
+        p_p.font.color.rgb = ZEISS_BLUE
         p_p.alignment = PP_ALIGN.CENTER
 
         # Slide Number
-        num_box = slide.shapes.add_textbox(Inches(10.8), Inches(7.02), Inches(1.8), Inches(0.35))
+        num_box = slide.shapes.add_textbox(Inches(10.8), Inches(7.05), Inches(1.8), Inches(0.35))
         tf_n = num_box.text_frame
         p_n = tf_n.paragraphs[0]
         p_n.text = f"{slide_num} / {total_slides}"
-        p_n.font.size = Pt(12.5)
+        p_n.font.size = Pt(12.0)
         p_n.font.bold = True
         p_n.font.color.rgb = TEXT_MUTED
         p_n.alignment = PP_ALIGN.RIGHT
 
-    def create_metric_tile(slide, left, top, width, height, stat_value, stat_label, accent_color=ACCENT_CYAN):
+    def create_metric_tile(slide, left, top, width, height, stat_value, stat_label, accent_color=ZEISS_BLUE):
         tile = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
         tile.fill.solid()
         tile.fill.fore_color.rgb = BG_CARD
-        tile.line.color.rgb = BG_CARD_BORDER
+        tile.line.color.rgb = BORDER_DEFAULT
         tile.line.width = Pt(1.5)
 
         tx = slide.shapes.add_textbox(left, top + Inches(0.08), width, height - Inches(0.12))
@@ -117,10 +127,19 @@ def build_final_6_slide_deck(output_paths: list = None):
 
         p2 = tf.add_paragraph()
         p2.text = stat_label
-        p2.font.size = Pt(11.0)
+        p2.font.size = Pt(10.5)
         p2.font.bold = True
         p2.font.color.rgb = TEXT_MUTED
         p2.alignment = PP_ALIGN.CENTER
+
+    card_top = Inches(1.55)
+    card_h = Inches(4.3)
+    card_w = Inches(5.8)
+    col1_l = Inches(0.7)
+    col2_l = Inches(6.8)
+    m_top = Inches(5.95)
+    m_w = Inches(2.8)
+    m_h = Inches(0.95)
 
     # =========================================================================
     # SLIDE 1: EXECUTIVE VISION — THE RURAL & RETAIL OPTICAL DILEMMA
@@ -130,12 +149,6 @@ def build_final_6_slide_deck(output_paths: list = None):
     add_top_nav(s1, "No-Device Vision Intelligence for Walk-In Retail", "Theme 2 (Primary) & Theme 1 (AFI)", "01",
                 presenter_sub="NAYANEE (ನಯनी)  •  PRESENTED BY GROUP CODERS: SATISH SM, TEJASWINI C B (BMSIT)")
 
-    card_top = Inches(1.55)
-    card_h = Inches(4.3)
-    card_w = Inches(5.8)
-    col1_l = Inches(0.7)
-    col2_l = Inches(6.8)
-
     # Left Column: The Problem Card
     left_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col1_l, card_top, card_w, card_h)
     left_card.fill.solid()
@@ -143,7 +156,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     left_card.line.color.rgb = ACCENT_RED
     left_card.line.width = Pt(2.0)
 
-    tx_l = s1.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx_l = s1.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf_l = tx_l.text_frame
     tf_l.word_wrap = True
 
@@ -165,12 +178,12 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✕  {title}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
 
         run = p.add_run()
         run.text = desc
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: The Nayanee Solution Card
@@ -180,7 +193,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     right_card.line.color.rgb = ACCENT_GREEN
     right_card.line.width = Pt(2.0)
 
-    tx_r = s1.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx_r = s1.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf_r = tx_r.text_frame
     tf_r.word_wrap = True
 
@@ -202,22 +215,19 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓  {title}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
 
         run = p.add_run()
         run.text = desc
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
-    m_w = Inches(2.8)
-    m_h = Inches(0.95)
-    m_top = Inches(5.95)
     create_metric_tile(s1, Inches(0.7), m_top, m_w, m_h, "$0", "HARDWARE EQUIPMENT CAPEX", ACCENT_GREEN)
-    create_metric_tile(s1, Inches(3.73), m_top, m_w, m_h, "6", "NATIVE INDIC LANGUAGES", ACCENT_CYAN)
-    create_metric_tile(s1, Inches(6.8), m_top, m_w, m_h, "< 90s", "INTAKE COMPLETION TIME", ACCENT_CYAN)
-    create_metric_tile(s1, Inches(9.83), m_top, m_w, m_h, "100%", "ZERO-GPU CPU EXECUTION", ACCENT_BLUE)
+    create_metric_tile(s1, Inches(3.73), m_top, m_w, m_h, "6", "NATIVE INDIC LANGUAGES", ZEISS_BLUE)
+    create_metric_tile(s1, Inches(6.8), m_top, m_w, m_h, "< 90s", "INTAKE COMPLETION TIME", ZEISS_BLUE)
+    create_metric_tile(s1, Inches(9.83), m_top, m_w, m_h, "100%", "ZERO-GPU CPU EXECUTION", ZEISS_BLUE)
 
     # =========================================================================
     # SLIDE 2: MATHEMATICAL INNOVATION — ACTIVE BAYESIAN ANAMNESIS
@@ -230,10 +240,10 @@ def build_final_6_slide_deck(output_paths: list = None):
     card2_l = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col1_l, card_top, card_w, card_h)
     card2_l.fill.solid()
     card2_l.fill.fore_color.rgb = BG_CARD
-    card2_l.line.color.rgb = ACCENT_CYAN
+    card2_l.line.color.rgb = ZEISS_BLUE
     card2_l.line.width = Pt(2.0)
 
-    tx2_l = s2.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx2_l = s2.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf2_l = tx2_l.text_frame
     tf2_l.word_wrap = True
 
@@ -241,7 +251,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "ACTIVE INFERENCE & INFORMATION GAIN"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_CYAN
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     math_points = [
@@ -255,21 +265,21 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"• {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: Pruning & Consistency
     card2_r = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col2_l, card_top, card_w, card_h)
     card2_r.fill.solid()
     card2_r.fill.fore_color.rgb = BG_CARD
-    card2_r.line.color.rgb = ACCENT_BLUE
+    card2_r.line.color.rgb = ZEISS_BLUE
     card2_r.line.width = Pt(2.0)
 
-    tx2_r = s2.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx2_r = s2.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf2_r = tx2_r.text_frame
     tf2_r.word_wrap = True
 
@@ -277,7 +287,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "TREE PRUNING & CONTRADICTION SENTINEL"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_BLUE
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     pruning_points = [
@@ -291,18 +301,18 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓ {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
-    create_metric_tile(s2, Inches(0.7), m_top, m_w, m_h, "7.2", "AVG QUESTIONS ASKED", ACCENT_CYAN)
+    create_metric_tile(s2, Inches(0.7), m_top, m_w, m_h, "7.2", "AVG QUESTIONS ASKED", ZEISS_BLUE)
     create_metric_tile(s2, Inches(3.73), m_top, m_w, m_h, "< 2 ms", "INFERENCE TURN LATENCY", ACCENT_GREEN)
-    create_metric_tile(s2, Inches(6.8), m_top, m_w, m_h, "67%", "REDUCTION VS 24-QN FORMS", ACCENT_CYAN)
-    create_metric_tile(s2, Inches(9.83), m_top, m_w, m_h, "100%", "DETERMINISTIC SAFETY", ACCENT_BLUE)
+    create_metric_tile(s2, Inches(6.8), m_top, m_w, m_h, "67%", "REDUCTION VS 24-QN FORMS", ZEISS_BLUE)
+    create_metric_tile(s2, Inches(9.83), m_top, m_w, m_h, "100%", "DETERMINISTIC SAFETY", ZEISS_BLUE)
 
     # =========================================================================
     # SLIDE 3: ZERO-HARDWARE CLINICAL SCREENING SUITE
@@ -318,7 +328,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     card3_l.line.color.rgb = ACCENT_GREEN
     card3_l.line.width = Pt(2.0)
 
-    tx3_l = s3.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx3_l = s3.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf3_l = tx3_l.text_frame
     tf3_l.word_wrap = True
 
@@ -340,11 +350,11 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"• {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: Acute Red-Flag Emergency Sentinel
@@ -354,7 +364,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     card3_r.line.color.rgb = ACCENT_RED
     card3_r.line.width = Pt(2.0)
 
-    tx3_r = s3.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx3_r = s3.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf3_r = tx3_r.text_frame
     tf3_r.word_wrap = True
 
@@ -376,18 +386,18 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓ {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
     create_metric_tile(s3, Inches(0.7), m_top, m_w, m_h, "3", "CALIBRATED SCREEN TESTS", ACCENT_GREEN)
-    create_metric_tile(s3, Inches(3.73), m_top, m_w, m_h, "10°", "CENTRAL MACULAR GUARD", ACCENT_CYAN)
+    create_metric_tile(s3, Inches(3.73), m_top, m_w, m_h, "10°", "CENTRAL MACULAR GUARD", ACCENT_TEAL)
     create_metric_tile(s3, Inches(6.8), m_top, m_w, m_h, "Turn 2", "SAFETY CIRCUIT BREAKER", ACCENT_RED)
-    create_metric_tile(s3, Inches(9.83), m_top, m_w, m_h, "100%", "SCREEN HARDWARE AGNOSTIC", ACCENT_BLUE)
+    create_metric_tile(s3, Inches(9.83), m_top, m_w, m_h, "100%", "SCREEN HARDWARE AGNOSTIC", ZEISS_BLUE)
 
     # =========================================================================
     # SLIDE 4: INTERACTIVE VISUAL PERCEPTION SIMULATOR
@@ -400,10 +410,10 @@ def build_final_6_slide_deck(output_paths: list = None):
     card4_l = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col1_l, card_top, card_w, card_h)
     card4_l.fill.solid()
     card4_l.fill.fore_color.rgb = BG_CARD
-    card4_l.line.color.rgb = ACCENT_ORANGE
+    card4_l.line.color.rgb = ACCENT_AMBER
     card4_l.line.width = Pt(2.0)
 
-    tx4_l = s4.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx4_l = s4.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf4_l = tx4_l.text_frame
     tf4_l.word_wrap = True
 
@@ -411,7 +421,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "SOLVING 'THE INVISIBLE PRODUCT DILEMMA'"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_ORANGE
+    p.font.color.rgb = ACCENT_AMBER
     p.space_after = Pt(12)
 
     sim_arch_points = [
@@ -425,21 +435,21 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"• {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: 4 Complaint-Driven Scenarios
     card4_r = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col2_l, card_top, card_w, card_h)
     card4_r.fill.solid()
     card4_r.fill.fore_color.rgb = BG_CARD
-    card4_r.line.color.rgb = ACCENT_CYAN
+    card4_r.line.color.rgb = ZEISS_BLUE
     card4_r.line.width = Pt(2.0)
 
-    tx4_r = s4.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx4_r = s4.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf4_r = tx4_r.text_frame
     tf4_r.word_wrap = True
 
@@ -447,7 +457,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "4 ANAMNESIS-DRIVEN REALISTIC SCENARIOS"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_CYAN
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     scenarios = [
@@ -461,18 +471,18 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓ {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
-    create_metric_tile(s4, Inches(0.7), m_top, m_w, m_h, "4", "DYNAMIC SCENARIO MODES", ACCENT_ORANGE)
+    create_metric_tile(s4, Inches(0.7), m_top, m_w, m_h, "4", "DYNAMIC SCENARIO MODES", ACCENT_AMBER)
     create_metric_tile(s4, Inches(3.73), m_top, m_w, m_h, "60 FPS", "SPLIT SLIDER RENDERING", ACCENT_GREEN)
-    create_metric_tile(s4, Inches(6.8), m_top, m_w, m_h, "64%", "HEADLIGHT GLARE REDUCTION", ACCENT_CYAN)
-    create_metric_tile(s4, Inches(9.83), m_top, m_w, m_h, "3×", "WIDER CLEARVIEW ZONE", ACCENT_BLUE)
+    create_metric_tile(s4, Inches(6.8), m_top, m_w, m_h, "64%", "HEADLIGHT GLARE REDUCTION", ZEISS_BLUE)
+    create_metric_tile(s4, Inches(9.83), m_top, m_w, m_h, "3×", "WIDER CLEARVIEW ZONE", ZEISS_BLUE)
 
     # =========================================================================
     # SLIDE 5: ZEISS RETAIL INTEROPERABILITY & PRACTICE HANDOVER
@@ -485,10 +495,10 @@ def build_final_6_slide_deck(output_paths: list = None):
     card5_l = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col1_l, card_top, card_w, card_h)
     card5_l.fill.solid()
     card5_l.fill.fore_color.rgb = BG_CARD
-    card5_l.line.color.rgb = ACCENT_BLUE
+    card5_l.line.color.rgb = ZEISS_BLUE
     card5_l.line.width = Pt(2.0)
 
-    tx5_l = s5.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx5_l = s5.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf5_l = tx5_l.text_frame
     tf5_l.word_wrap = True
 
@@ -496,7 +506,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "ZEISS VISUCONSULT 500 DIGITAL BRIDGE"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_BLUE
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     interop_points = [
@@ -510,21 +520,21 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"• {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: Emerging Market Ergonomics
     card5_r = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col2_l, card_top, card_w, card_h)
     card5_r.fill.solid()
     card5_r.fill.fore_color.rgb = BG_CARD
-    card5_r.line.color.rgb = ACCENT_CYAN
+    card5_r.line.color.rgb = ZEISS_BLUE
     card5_r.line.width = Pt(2.0)
 
-    tx5_r = s5.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx5_r = s5.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf5_r = tx5_r.text_frame
     tf5_r.word_wrap = True
 
@@ -532,7 +542,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "ZEISS PORTFOLIO & EMERGING MARKET LOGIC"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_CYAN
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     market_points = [
@@ -546,18 +556,18 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓ {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
-    create_metric_tile(s5, Inches(0.7), m_top, m_w, m_h, "1-Click", "VISUCONSULT 500 QR BRIDGE", ACCENT_BLUE)
-    create_metric_tile(s5, Inches(3.73), m_top, m_w, m_h, "80mm / A4", "THERMAL & PRINT SLIP", ACCENT_CYAN)
+    create_metric_tile(s5, Inches(0.7), m_top, m_w, m_h, "1-Click", "VISUCONSULT 500 QR BRIDGE", ZEISS_BLUE)
+    create_metric_tile(s5, Inches(3.73), m_top, m_w, m_h, "80mm / A4", "THERMAL & PRINT SLIP", ZEISS_BLUE)
     create_metric_tile(s5, Inches(6.8), m_top, m_w, m_h, "0–100", "ADAPTATION RISK SCORE", ACCENT_GREEN)
-    create_metric_tile(s5, Inches(9.83), m_top, m_w, m_h, "ANSI Z87.1", "ROAD & SPORTS SAFETY", ACCENT_CYAN)
+    create_metric_tile(s5, Inches(9.83), m_top, m_w, m_h, "ANSI Z87.1", "ROAD & SPORTS SAFETY", ZEISS_BLUE)
 
     # =========================================================================
     # SLIDE 6: TECH STACK, RED TEAM SECURITY, IMPACT & ROADMAP
@@ -573,7 +583,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     card6_l.line.color.rgb = ACCENT_GREEN
     card6_l.line.width = Pt(2.0)
 
-    tx6_l = s6.shapes.add_textbox(col1_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx6_l = s6.shapes.add_textbox(col1_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf6_l = tx6_l.text_frame
     tf6_l.word_wrap = True
 
@@ -595,21 +605,21 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"• {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Right Column: Live Deployment & Roadmap
     card6_r = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, col2_l, card_top, card_w, card_h)
     card6_r.fill.solid()
     card6_r.fill.fore_color.rgb = BG_CARD
-    card6_r.line.color.rgb = ACCENT_CYAN
+    card6_r.line.color.rgb = ZEISS_BLUE
     card6_r.line.width = Pt(2.0)
 
-    tx6_r = s6.shapes.add_textbox(col2_l + Inches(0.25), card_top + Inches(0.2), card_w - Inches(0.5), card_h - Inches(0.35))
+    tx6_r = s6.shapes.add_textbox(col2_l + Inches(0.28), card_top + Inches(0.22), card_w - Inches(0.56), card_h - Inches(0.4))
     tf6_r = tx6_r.text_frame
     tf6_r.word_wrap = True
 
@@ -617,7 +627,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     p.text = "DEPLOYMENT, REPOSITORY & ROADMAP"
     p.font.size = Pt(16.5)
     p.font.bold = True
-    p.font.color.rgb = ACCENT_CYAN
+    p.font.color.rgb = ZEISS_BLUE
     p.space_after = Pt(12)
 
     roadmap_points = [
@@ -631,24 +641,24 @@ def build_final_6_slide_deck(output_paths: list = None):
         p.text = f"✓ {t}: "
         p.font.size = Pt(13.5)
         p.font.bold = True
-        p.font.color.rgb = TEXT_LIGHT
+        p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_MUTED
+        run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(10)
 
     # Bottom Metric Strip
     create_metric_tile(s6, Inches(0.7), m_top, m_w, m_h, "85 / 85", "CI TEST SUITE PASSING", ACCENT_GREEN)
-    create_metric_tile(s6, Inches(3.73), m_top, m_w, m_h, "4.06s", "TEST EXECUTION TIME", ACCENT_CYAN)
-    create_metric_tile(s6, Inches(6.8), m_top, m_w, m_h, "5 Cycles", "RED TEAM SECURITY AUDIT", ACCENT_BLUE)
-    create_metric_tile(s6, Inches(9.83), m_top, m_w, m_h, "Open Source", "GITHUB.COM/SATISH8460/NAYANEE", ACCENT_CYAN)
+    create_metric_tile(s6, Inches(3.73), m_top, m_w, m_h, "4.06s", "TEST EXECUTION TIME", ZEISS_BLUE)
+    create_metric_tile(s6, Inches(6.8), m_top, m_w, m_h, "5 Cycles", "RED TEAM SECURITY AUDIT", ZEISS_BLUE)
+    create_metric_tile(s6, Inches(9.83), m_top, m_w, m_h, "Open Source", "GITHUB.COM/SATISH8460/NAYANEE", ZEISS_BLUE)
 
     # Save to disk
     for out_p in output_paths:
         try:
             prs.save(out_p)
-            print(f"✨ Successfully generated executive presentation: {out_p}")
+            print(f"✨ Successfully generated light-theme presentation: {out_p}")
         except PermissionError:
             print(f"⚠️ Could not write to {out_p} (file in use).")
 
