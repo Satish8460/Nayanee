@@ -3,13 +3,11 @@ for Nayanee — ZEISS Hackathon Final Submission.
 Team: Group Coders | Satish SM, Tejaswini C B | BMSIT
 Themes: Theme 2 (No-Device Vision Intelligence) & Theme 1 (AFI)
 
-LIGHT EXECUTIVE THEME WITH ALL 8 REAL PRODUCTION SCREENSHOTS:
-- Slide 1: Language Selection & Patient Information Kiosk Screen
-- Slide 2: Active Anamnesis Turn 1 (Bilingual Kannada) + Live Voice Waveform Recording
-- Slide 3: 3 Calibrated Screening Tests (Duochrome, Astigmatic Dial, Amsler Grid)
-- Slide 4: ZEISS Matched Profile & Interactive Split Perception Simulator
-- Slide 5: Authentic Printable Consultation Slip with VISUCONSULT 500 QR & Sign-off
-- Slide 6: Full Tech Stack, 5-Iteration Red Team Hardening & Deployment Roadmap
+ENHANCED PROPORTIONAL LAYOUT WITH PROMINENT FIGURES & COMPLETE TECHNICAL DEPTH:
+- All figures explicitly labeled: Fig 1 to Fig 8 with clear clinical captions
+- Enhanced 2x2 grid on Slide 3 so Duochrome, Astigmatic Dial, Amsler Grid, and Voice Waveform are large and prominent (3.1 in wide each, never diminished)
+- Slide 2 features full-height Fig 2 (4.3 in wide) with complete Bayesian math & priors
+- All important technical & clinical terms preserved verbatim
 """
 
 import os
@@ -24,9 +22,10 @@ from pptx.enum.shapes import MSO_SHAPE
 def build_final_6_slide_deck(output_paths: list = None):
     if output_paths is None:
         output_paths = [
-            "docs/Nayanee_Final_Presentation_Coders_6_Slides_Light.pptx",
-            "docs/Nayanee_Final_Presentation_Coders_6_Slides.pptx",
+            "docs/Nayanee_Final_Presentation_Coders_6_Slides_v3.pptx",
             "docs/Nayanee_Final_Presentation_Coders_6_Slides_v2.pptx",
+            "docs/Nayanee_Final_Presentation_Coders_6_Slides.pptx",
+            "docs/Nayanee_Final_Presentation_Coders_6_Slides_Light.pptx",
         ]
     prs = Presentation()
     prs.slide_width = Inches(13.333)
@@ -62,7 +61,6 @@ def build_final_6_slide_deck(output_paths: list = None):
         return bg
 
     def add_top_nav(slide, title_text, category_pill, slide_num, total_slides="06", presenter_sub=None):
-        # Header Box
         tx = slide.shapes.add_textbox(Inches(0.7), Inches(0.32), Inches(8.8), Inches(1.15))
         tf = tx.text_frame
         tf.word_wrap = True
@@ -84,7 +82,6 @@ def build_final_6_slide_deck(output_paths: list = None):
         p_title.font.bold = True
         p_title.font.color.rgb = TEXT_HEAD
 
-        # Pill Tag (Top Right)
         pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.2), Inches(0.38), Inches(3.45), Inches(0.52))
         pill.fill.solid()
         pill.fill.fore_color.rgb = PILL_BG
@@ -98,7 +95,6 @@ def build_final_6_slide_deck(output_paths: list = None):
         p_p.font.color.rgb = ZEISS_BLUE
         p_p.alignment = PP_ALIGN.CENTER
 
-        # Slide Number
         num_box = slide.shapes.add_textbox(Inches(10.8), Inches(7.05), Inches(1.8), Inches(0.35))
         tf_n = num_box.text_frame
         p_n = tf_n.paragraphs[0]
@@ -134,7 +130,7 @@ def build_final_6_slide_deck(output_paths: list = None):
         p2.font.color.rgb = TEXT_MUTED
         p2.alignment = PP_ALIGN.CENTER
 
-    def add_framed_screenshot(slide, image_path, card_l, card_t, card_w, card_h, badge_text, border_color=ZEISS_BLUE, extra_note=None, sub_badge=None):
+    def add_framed_screenshot(slide, image_path, card_l, card_t, card_w, card_h, fig_title, border_color=ZEISS_BLUE, extra_note=None, sub_badge=None):
         card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, card_l, card_t, card_w, card_h)
         card.fill.solid()
         card.fill.fore_color.rgb = BG_CARD
@@ -142,13 +138,13 @@ def build_final_6_slide_deck(output_paths: list = None):
         card.line.width = Pt(1.5)
 
         top_bar_h = Inches(0.32)
-        tx_b = slide.shapes.add_textbox(card_l + Inches(0.1), card_t + Inches(0.08), card_w - Inches(0.2), top_bar_h)
+        tx_b = slide.shapes.add_textbox(card_l + Inches(0.08), card_t + Inches(0.06), card_w - Inches(0.16), top_bar_h)
         tf_b = tx_b.text_frame
         tf_b.word_wrap = True
         tf_b.margin_left = tf_b.margin_right = tf_b.margin_top = tf_b.margin_bottom = 0
         p_b = tf_b.paragraphs[0]
-        p_b.text = badge_text
-        p_b.font.size = Pt(10.0)
+        p_b.text = fig_title
+        p_b.font.size = Pt(9.5)
         p_b.font.bold = True
         p_b.font.color.rgb = border_color
         p_b.alignment = PP_ALIGN.CENTER
@@ -156,19 +152,19 @@ def build_final_6_slide_deck(output_paths: list = None):
         if sub_badge:
             p_sub = tf_b.add_paragraph()
             p_sub.text = sub_badge
-            p_sub.font.size = Pt(8.5)
+            p_sub.font.size = Pt(8.0)
             p_sub.font.bold = True
             p_sub.font.color.rgb = TEXT_MUTED
             p_sub.alignment = PP_ALIGN.CENTER
-            top_bar_h = Inches(0.48)
+            top_bar_h = Inches(0.46)
 
         with Image.open(image_path) as img:
             img_w, img_h = img.size
 
-        note_space = Inches(0.4) if extra_note else Inches(0.0)
-        top_offset = card_t + top_bar_h + Inches(0.08)
-        max_w = card_w - Inches(0.25)
-        max_h = card_h - top_bar_h - Inches(0.18) - note_space
+        note_space = Inches(0.38) if extra_note else Inches(0.0)
+        top_offset = card_t + top_bar_h + Inches(0.06)
+        max_w = card_w - Inches(0.2)
+        max_h = card_h - top_bar_h - Inches(0.14) - note_space
 
         scale = min(max_w / img_w, max_h / img_h)
         target_w = int(img_w * scale)
@@ -180,13 +176,13 @@ def build_final_6_slide_deck(output_paths: list = None):
         slide.shapes.add_picture(image_path, pos_l, pos_t, target_w, target_h)
 
         if extra_note:
-            tx_n = slide.shapes.add_textbox(card_l + Inches(0.1), card_t + card_h - Inches(0.38), card_w - Inches(0.2), Inches(0.32))
+            tx_n = slide.shapes.add_textbox(card_l + Inches(0.08), card_t + card_h - Inches(0.36), card_w - Inches(0.16), Inches(0.3))
             tf_n = tx_n.text_frame
             tf_n.word_wrap = True
             tf_n.margin_left = tf_n.margin_right = tf_n.margin_top = tf_n.margin_bottom = 0
             p_n = tf_n.paragraphs[0]
             p_n.text = extra_note
-            p_n.font.size = Pt(9.0)
+            p_n.font.size = Pt(8.5)
             p_n.font.bold = True
             p_n.font.color.rgb = TEXT_MUTED
             p_n.alignment = PP_ALIGN.CENTER
@@ -242,7 +238,7 @@ def build_final_6_slide_deck(output_paths: list = None):
         run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(8)
 
-    # Right Column: Screenshot 1 (Language Selection Kiosk)
+    # Right Column: Fig 1 (Language Selection & Intake Kiosk)
     add_framed_screenshot(
         s1,
         "docs/assets/screenshots/01_language_intake.png",
@@ -250,9 +246,9 @@ def build_final_6_slide_deck(output_paths: list = None):
         card_top,
         Inches(5.333),
         card_h,
-        "PRODUCTION KIOSK • 6 INDIC LANGUAGES + DEMOGRAPHICS",
+        "Fig 1: Multi-Lingual Intake Kiosk (6 Indic Languages + Demographics)",
         border_color=ZEISS_BLUE,
-        extra_note="Touch Kiosk: Kannada, Hindi, Tamil, Telugu, Malayalam & English"
+        extra_note="Touch-First Kiosk: Kannada, Hindi, Tamil, Telugu, Malayalam & English"
     )
 
     create_metric_tile(s1, Inches(0.7), m_top, m_w, m_h, "$0", "HARDWARE EQUIPMENT CAPEX", ACCENT_GREEN)
@@ -304,37 +300,17 @@ def build_final_6_slide_deck(output_paths: list = None):
         run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(8)
 
-    # Right Column: Two Stacked Screenshots (Bilingual Question + Voice Waveform)
-    right_col_l = Inches(8.2)
-    right_col_w = Inches(4.433)
-    top_box_h = Inches(2.1)
-    bottom_box_h = Inches(2.15)
-    gap_y = Inches(0.1)
-
-    # Screenshot 2A: Active Turn Question in Kannada
+    # Right Column: Fig 2 (Large, prominent Active Anamnesis Turn 1 in Kannada)
     add_framed_screenshot(
         s2,
         "docs/assets/screenshots/02_active_anamnesis.jpg",
-        right_col_l,
+        Inches(8.2),
         card_top,
-        right_col_w,
-        top_box_h,
-        "ACTIVE ANAMNESIS TURN 1 (KANNADA + EN)",
+        Inches(4.433),
+        card_h,
+        "Fig 2: Active Anamnesis Turn 1 (Kannada UI + English Subtitle)",
         border_color=ZEISS_BLUE,
-        extra_note="Audio Listen Button 🔊 + Colloquial Cards"
-    )
-
-    # Screenshot 2B: Live Voice Waveform Recording
-    add_framed_screenshot(
-        s2,
-        "docs/assets/screenshots/03_voice_recording_triage.png",
-        right_col_l,
-        card_top + top_box_h + gap_y,
-        right_col_w,
-        bottom_box_h,
-        "LIVE VOICE RECORDING & INTENT PARSER",
-        border_color=ACCENT_RED,
-        extra_note="Microphone Waveform + Spoken Quick Prompts"
+        extra_note="Spoken Audio Playback 🔊 + Touch-Response Chief Complaint Tiles"
     )
 
     create_metric_tile(s2, Inches(0.7), m_top, m_w, m_h, "7.2", "AVG QUESTIONS ASKED", ZEISS_BLUE)
@@ -343,97 +319,113 @@ def build_final_6_slide_deck(output_paths: list = None):
     create_metric_tile(s2, Inches(9.83), m_top, m_w, m_h, "100%", "DETERMINISTIC SAFETY", ZEISS_BLUE)
 
     # =========================================================================
-    # SLIDE 3: ZERO-HARDWARE CLINICAL SCREENING SUITE (ALL 3 TESTS SHOWN!)
+    # SLIDE 3: ZERO-HARDWARE CLINICAL SCREENING SUITE (2x2 PROMINENT GRID!)
     # =========================================================================
     s3 = prs.slides.add_slide(blank_layout)
     paint_background(s3)
     add_top_nav(s3, "Zero-Hardware Refractive & Macular Screening Suite", "Device-Free Triaging", "03")
 
-    # Left Column: Screen Tests & Turn-2 Circuit Breaker (Width: 6.0 in)
-    col3_w = Inches(5.9)
+    col3_w = Inches(5.4)
     card3_l = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.7), card_top, col3_w, card_h)
     card3_l.fill.solid()
     card3_l.fill.fore_color.rgb = BG_CARD
     card3_l.line.color.rgb = ACCENT_GREEN
     card3_l.line.width = Pt(2.0)
 
-    tx3_l = s3.shapes.add_textbox(Inches(0.95), card_top + Inches(0.2), col3_w - Inches(0.5), card_h - Inches(0.35))
+    tx3_l = s3.shapes.add_textbox(Inches(0.92), card_top + Inches(0.18), col3_w - Inches(0.44), card_h - Inches(0.32))
     tf3_l = tx3_l.text_frame
     tf3_l.word_wrap = True
 
     p = tf3_l.paragraphs[0]
     p.text = "3 ON-SCREEN TESTS & TURN-2 SENTINEL"
-    p.font.size = Pt(16.0)
+    p.font.size = Pt(15.5)
     p.font.bold = True
     p.font.color.rgb = ACCENT_GREEN
-    p.space_after = Pt(10)
+    p.space_after = Pt(8)
 
     tests_points = [
         ("Red-Green Duochrome Test", "Evaluates longitudinal chromatic aberration (650nm Red vs 535nm Green). Red clearer indicates myopia; Green clearer indicates hyperopia/over-minusing."),
         ("Astigmatic Clock Dial", "Visualizes the Conoid of Sturm at 30° radial meridians on Retina/OLED displays, identifying dominant cylinder axis for JCC refinement."),
         ("Amsler Grid Macular Guard", "Evaluates central 10° of visual field. Detects metamorphopsia (wavy lines) or scotomas (blind spots), flagging macular edema or AMD."),
         ("Turn-2 Invariant Circuit Breaker", "Every patient is probed for acute red flags on Turn 2. Flashes, floaters, or severe pain immediately halt intake with urgent hospital triage."),
-        ("Zero Hallucination Guarantee", "Deterministic state machine; never guesses a prescription or replaces professional refraction when pathology is suspected.")
+        ("Zero Hallucination Guarantee", "Deterministic state machine; generates an emergency ophthalmology pass and never dispenses glasses when pathology is suspected.")
     ]
     for t, d in tests_points:
         p = tf3_l.add_paragraph()
         p.text = f"• {t}: "
-        p.font.size = Pt(12.0)
+        p.font.size = Pt(11.5)
         p.font.bold = True
         p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
         run.font.color.rgb = TEXT_BODY
-        p.space_after = Pt(7)
+        p.space_after = Pt(6)
 
-    # Right Side: 3 Test Cards Side-by-Side (Width: ~1.85 in each)
-    test_w = Inches(1.85)
-    test_gap = Inches(0.18)
-    t1_left = Inches(6.85)
-    t2_left = t1_left + test_w + test_gap
-    t3_left = t2_left + test_w + test_gap
+    # Right Side: 2x2 Prominent Grid (Width: 3.1 in each, Height: 2.1 in each)
+    grid_w = Inches(3.1)
+    grid_h = Inches(2.1)
+    gap_x = Inches(0.2)
+    gap_y = Inches(0.15)
+    r_col1 = Inches(6.35)
+    r_col2 = r_col1 + grid_w + gap_x
+    r_row1 = card_top
+    r_row2 = card_top + grid_h + gap_y
 
-    # Test 1: Duochrome Test
+    # Fig 3: Red-Green Duochrome Test
     add_framed_screenshot(
         s3,
         "docs/assets/screenshots/06_duochrome_test.png",
-        t1_left,
-        card_top,
-        test_w,
-        card_h,
-        "1. DUOCHROME",
+        r_col1,
+        r_row1,
+        grid_w,
+        grid_h,
+        "Fig 3: Duochrome (Spherical Balance)",
         border_color=ACCENT_GREEN,
-        sub_badge="Spherical Balance",
-        extra_note="Red (650nm) / Green (535nm)"
+        sub_badge="Red (650nm) vs Green (535nm)",
+        extra_note="Evaluates Myopia / Hyperopia Accommodation"
     )
 
-    # Test 2: Astigmatic Clock Dial
+    # Fig 4: Astigmatic Clock Dial
     add_framed_screenshot(
         s3,
         "docs/assets/screenshots/07_astigmatic_dial.png",
-        t2_left,
-        card_top,
-        test_w,
-        card_h,
-        "2. ASTIGMATISM",
+        r_col2,
+        r_row1,
+        grid_w,
+        grid_h,
+        "Fig 4: Astigmatic Clock Dial Fan",
         border_color=ZEISS_BLUE,
-        sub_badge="Clock Dial Fan",
-        extra_note="30° Radial Cylinder Axis"
+        sub_badge="30° Radial Cylindrical Meridians",
+        extra_note="Identifies Principal Astigmatic Axis"
     )
 
-    # Test 3: Amsler Grid Macular Guard
+    # Fig 5: Amsler Grid Macular Guard
     add_framed_screenshot(
         s3,
         "docs/assets/screenshots/08_amsler_grid.png",
-        t3_left,
-        card_top,
-        test_w,
-        card_h,
-        "3. AMSLER GRID",
+        r_col1,
+        r_row2,
+        grid_w,
+        grid_h,
+        "Fig 5: Amsler Grid Macular Guard",
         border_color=ACCENT_RED,
-        sub_badge="Macular Guard",
-        extra_note="10° Central Field (AMD)"
+        sub_badge="Central 10° Foveal Field Check",
+        extra_note="Detects Metamorphopsia & Macular Edema"
+    )
+
+    # Fig 6: Live Spoken Voice Waveform Recording & Acute Red-Flag Triage
+    add_framed_screenshot(
+        s3,
+        "docs/assets/screenshots/03_voice_recording_triage.png",
+        r_col2,
+        r_row2,
+        grid_w,
+        grid_h,
+        "Fig 6: Spoken Red-Flag Emergency Triage",
+        border_color=ACCENT_RED,
+        sub_badge="Voice Waveform + Instant Speech SLU",
+        extra_note="Immediate Emergency Halt on Acute Symptoms"
     )
 
     create_metric_tile(s3, Inches(0.7), m_top, m_w, m_h, "3", "CALIBRATED SCREEN TESTS", ACCENT_GREEN)
@@ -485,7 +477,7 @@ def build_final_6_slide_deck(output_paths: list = None):
         run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(8)
 
-    # Right Column: Screenshot 4 (Live Simulator & SmartLife Match)
+    # Right Column: Fig 7 (Live ZEISS Match & Split Perception Simulator)
     add_framed_screenshot(
         s4,
         "docs/assets/screenshots/04_visual_simulator_profile.png",
@@ -493,9 +485,9 @@ def build_final_6_slide_deck(output_paths: list = None):
         card_top,
         Inches(4.333),
         card_h,
-        "LIVE ZEISS MATCH & SPLIT SIMULATOR",
+        "Fig 7: Real-Time ZEISS Match & Split Perception Simulator",
         border_color=ZEISS_BLUE,
-        extra_note="Progressive Adaptation Risk: 20/100 (LOW)"
+        extra_note="Progressive Adaptation Risk: 20/100 (LOW) • Interactive Split Slider"
     )
 
     create_metric_tile(s4, Inches(0.7), m_top, m_w, m_h, "4", "DYNAMIC SCENARIO MODES", ACCENT_AMBER)
@@ -547,7 +539,7 @@ def build_final_6_slide_deck(output_paths: list = None):
         run.font.color.rgb = TEXT_BODY
         p.space_after = Pt(8)
 
-    # Right Column: Screenshot 5 (Printable Consultation Slip)
+    # Right Column: Fig 8 (Authentic Printable Consultation Slip)
     add_framed_screenshot(
         s5,
         "docs/assets/screenshots/05_printable_consultation_slip.jpg",
@@ -555,9 +547,9 @@ def build_final_6_slide_deck(output_paths: list = None):
         card_top,
         Inches(4.333),
         card_h,
-        "AUTHENTIC VISUCONSULT 500 OPTICAL SLIP",
+        "Fig 8: Standardized VISUCONSULT 500 Optical Slip",
         border_color=ZEISS_BLUE,
-        extra_note="Includes QR Pass & Optometrist Signature Block"
+        extra_note="Includes Anamnesis, ZEISS Match, SVG QR & Optometrist Sign-off"
     )
 
     create_metric_tile(s5, Inches(0.7), m_top, m_w, m_h, "1-Click", "VISUCONSULT 500 QR BRIDGE", ZEISS_BLUE)
@@ -651,7 +643,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     for out_p in output_paths:
         try:
             prs.save(out_p)
-            print(f"✨ Successfully generated presentation with screenshots: {out_p}")
+            print(f"✨ Successfully generated presentation with prominent figures: {out_p}")
         except PermissionError:
             print(f"⚠️ Could not write to {out_p} (file in use).")
 
