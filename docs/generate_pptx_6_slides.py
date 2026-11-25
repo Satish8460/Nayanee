@@ -104,7 +104,7 @@ def build_final_6_slide_deck(output_paths: list = None):
         p_n.font.color.rgb = TEXT_MUTED
         p_n.alignment = PP_ALIGN.RIGHT
 
-    def create_metric_tile(slide, left, top, width, height, stat_value, stat_label, accent_color=ZEISS_BLUE):
+    def create_metric_tile(slide, left, top, width, height, stat_value, stat_label, accent_color=ZEISS_BLUE, link_url=None):
         tile = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
         tile.fill.solid()
         tile.fill.fore_color.rgb = BG_CARD
@@ -118,17 +118,21 @@ def build_final_6_slide_deck(output_paths: list = None):
 
         p1 = tf.paragraphs[0]
         p1.text = stat_value
-        p1.font.size = Pt(26)
+        p1.font.size = Pt(24 if len(stat_value) > 7 else 26)
         p1.font.bold = True
         p1.font.color.rgb = accent_color
         p1.alignment = PP_ALIGN.CENTER
+        if link_url and len(p1.runs) > 0:
+            p1.runs[0].hyperlink.address = link_url
 
         p2 = tf.add_paragraph()
         p2.text = stat_label
-        p2.font.size = Pt(10.0)
+        p2.font.size = Pt(9.5 if len(stat_label) > 22 else 10.0)
         p2.font.bold = True
         p2.font.color.rgb = TEXT_MUTED
         p2.alignment = PP_ALIGN.CENTER
+        if link_url and len(p2.runs) > 0:
+            p2.runs[0].hyperlink.address = link_url
 
     def add_framed_screenshot(slide, image_path, card_l, card_t, card_w, card_h, fig_title, border_color=ZEISS_BLUE, extra_note=None, sub_badge=None):
         card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, card_l, card_t, card_w, card_h)
@@ -199,7 +203,7 @@ def build_final_6_slide_deck(output_paths: list = None):
     s1 = prs.slides.add_slide(blank_layout)
     paint_background(s1)
     add_top_nav(s1, "No-Device Vision Intelligence for Walk-In Retail", "Theme 2 (Primary) & Theme 1 (AFI)", "01",
-                presenter_sub="NAYANEE (ನಯनी)  •  PRESENTED BY GROUP CODERS: SATISH SM, TEJASWINI C B (BMSIT)")
+                presenter_sub="NAYANEE (ನಯनी)  •  GROUP CODERS: SATISH SM, TEJASWINI C B (BMSIT)  |  https://github.com/Satish8460/Nayanee")
 
     col1_w = Inches(6.4)
     left_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.7), card_top, col1_w, card_h)
@@ -621,24 +625,28 @@ def build_final_6_slide_deck(output_paths: list = None):
         ("Live Demonstration Access", "Equipped with 1-click Cloudflare Quick Tunnel (share_nayanee.bat) for zero-config public HTTPS testing on judges' mobile phones."),
         ("Production PWA Kiosk", "Service Worker (sw.js) + Web Manifest (manifest.json) for 1-tap installation on Android/iPad clinic reception counters."),
         ("Near-Term Roadmap (2–4 wks)", "On-device Vosk WebAssembly speech recognition for 100% offline rural camps; optometrist dim-room dark mode."),
-        ("Major Roadmap (3–6 mos)", "OpenCV WebAssembly selfie-camera pupillometry (monocular PD & seg-height) with credit-card scaling; ABDM/FHIR locker sync.")
+        ("Major Roadmap (3–6 mos)", "OpenCV WebAssembly selfie-camera pupillometry (monocular PD & seg-height) with credit-card scaling; ABDM/FHIR locker sync."),
+        ("GitHub Repository", "Complete, documented, production-ready codebase with CI automation: https://github.com/Satish8460/Nayanee")
     ]
     for t, d in roadmap_points:
         p = tf6_r.add_paragraph()
         p.text = f"✓ {t}: "
-        p.font.size = Pt(13.0)
+        p.font.size = Pt(12.5)
         p.font.bold = True
         p.font.color.rgb = TEXT_BOLD
         run = p.add_run()
         run.text = d
         run.font.bold = False
-        run.font.color.rgb = TEXT_BODY
-        p.space_after = Pt(8)
+        run.font.color.rgb = ZEISS_BLUE if "http" in d else TEXT_BODY
+        if "http" in d:
+            run.font.bold = True
+            run.hyperlink.address = "https://github.com/Satish8460/Nayanee"
+        p.space_after = Pt(7)
 
     create_metric_tile(s6, Inches(0.7), m_top, m_w, m_h, "85 / 85", "CI TEST SUITE PASSING", ACCENT_GREEN)
     create_metric_tile(s6, Inches(3.73), m_top, m_w, m_h, "4.06s", "TEST EXECUTION TIME", ZEISS_BLUE)
     create_metric_tile(s6, Inches(6.8), m_top, m_w, m_h, "5 Cycles", "RED TEAM SECURITY AUDIT", ZEISS_BLUE)
-    create_metric_tile(s6, Inches(9.83), m_top, m_w, m_h, "Open Source", "GITHUB.COM/SATISH8460/NAYANEE", ZEISS_BLUE)
+    create_metric_tile(s6, Inches(9.83), m_top, m_w, m_h, "GitHub", "SATISH8460 / NAYANEE", ZEISS_BLUE, link_url="https://github.com/Satish8460/Nayanee")
 
     for out_p in output_paths:
         try:

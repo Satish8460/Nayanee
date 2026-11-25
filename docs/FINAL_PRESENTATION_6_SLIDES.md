@@ -127,6 +127,7 @@
 * ✓ **Production PWA Kiosk:** Service Worker (`sw.js`) + Web Manifest (`manifest.json`) for 1-tap installation on Android/iPad clinic reception counters.
 * ✓ **Near-Term Roadmap (2–4 wks):** On-device Vosk WebAssembly speech recognition for 100% offline rural camps; optometrist dim-room dark mode.
 * ✓ **Major Roadmap (3–6 mos):** OpenCV WebAssembly selfie-camera pupillometry (monocular PD & seg-height) with credit-card scaling; ABDM/FHIR locker sync.
+* ★ **GitHub Repository:** [https://github.com/Satish8460/Nayanee](https://github.com/Satish8460/Nayanee) (Complete, production-grade open source codebase with CI automation).
 
 ### Bottom Metrics
-* **85 / 85** CI Test Suite Passing | **4.06s** Test Execution Time | **5 Cycles** Red Team Security Audit | **Open Source** GITHUB.COM/SATISH8460/NAYANEE
+* **85 / 85** CI Test Suite Passing | **4.06s** Test Execution Time | **5 Cycles** Red Team Security Audit | **GitHub** [https://github.com/Satish8460/Nayanee](https://github.com/Satish8460/Nayanee)
